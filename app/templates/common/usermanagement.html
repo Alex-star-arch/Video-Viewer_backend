@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block navbar %}
+
+<link rel="stylesheet" href="https://stackedit.io/style.css" />
+
+<body class="stackedit" >
+<embed hidden="true" autostart="true" loop="true">
+<br><br>
+<div class="stackedit__html"><a id="_0"></a><h1><strong>用户基本信息</strong></h1>
+<ul>
+<img src = "./static/images/self.jpg" width="180" height="180" align = "right">
+<li>用户名：{{current_user.username}}</li>
+<li>手机号：{{current_user.phone}}</li>
+<li>邮箱： {{current_user.email}} </li>
+    <br>
+<div class="pull-left">
+<a href="{{ url_for('main.useredit') }}" class="btn btn-default btn-flat" >编辑</a>
+</div>
+</ul>
+<h1><strong>操作日志</strong></h1>
+</div>
+</body>
+{% endblock %}
+{% block content %}{% endblock %}
+

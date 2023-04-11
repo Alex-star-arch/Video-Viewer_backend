@@ -1,0 +1,75 @@
+{% extends "common/layout_main.html" %}
+{% block content %}
+<div class="row  border-bottom">
+    <div class="col-lg-12">
+        <div class="tab_title">
+            <ul class="nav nav-pills">
+                <li class="current">
+                    <a href="{{ url_for('stat_page.index') }}">财务统计</a>
+                </li>
+                <li>
+                    <a href="{{ url_for('stat_page.food') }}">售卖统计</a>
+                </li>
+                <li>
+                    <a href="{{ url_for('stat_page.member') }}">会员消费统计</a>
+                </li>
+                <li>
+                    <a href="{{ url_for('stat_page.share') }}">分享统计</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+<div class="row m-t">
+    <div class="col-lg-12" id="container" style="height: 400px;" data-highcharts-chart="0">
+
+    </div>
+    <div class="col-lg-12 m-t">
+        <table class="table table-bordered m-t">
+            <thead>
+            <tr>
+                <th>日期</th>
+                <th>营收金额</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% if pagination.data_list %}
+                {% for item in pagination.data_list %}
+            <tr>
+                <td>{{ item.date }}</td>
+                <td>{{ item.total_pay_money }}</td>
+            </tr>
+                {% endfor %}
+            {% else %}
+                <tr><td colspan="2">暂无数据~~</td></tr>
+            {% endif %}
+            </tbody>
+        </table>
+        <!--分页代码-->
+        <div class="row">
+            <div class="col-lg-12">
+                <span class="pagination_count" style="line-height: 40px;">共{{ pagination.totals }}条数据 | {{ pagination.total_pages }}页</span>
+                <ul class="pagination pagination-sm no-margin pull-right">
+                <li><a href="{{ url_for('stat_page.index') }}?page={{ pagination.prev_page }}">&laquo;</a></li>
+                {% if pagination.total_pages <= 15 %}
+                    {% for k in pagination.page_range %}
+                        {% if pagination.current_page == k %}
+                        <li class="active"><a href="{{ url_for('stat_page.index') }}?page={{ k }}">{{ k }}</a></li>
+                        {% else %}
+                        <li><a href="{{ url_for('stat_page.index') }}?page={{ k }}">{{ k }}</a></li>
+                        {% endif %}
+                    {% endfor %}
+                {% else %}
+                        <li><a href="javascript:void(0);">...</a></li>
+                {% endif %}
+                <li><a href="{{ url_for('stat_page.index') }}?page={{ pagination.next_page }}">&raquo;</a></li>
+              </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block js %}
+<script src="/static/plugins/echarts.min.js"></script>
+<script src="/static/js/stat/index.js"></script>
+{% endblock %}
