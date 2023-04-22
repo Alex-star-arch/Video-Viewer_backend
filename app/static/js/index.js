@@ -382,7 +382,6 @@ function CalcUserData() {
         operation: `
     <button class="update-btn btn btn-outline-primary btn-floating btn-sm" data-mdb-id="${row.id}"><i class="fas fa-edit"></i></button>
     <button class="delete-btn btn ms-2 btn-danger btn-floating btn-sm" data-mdb-id="${row.id}"><i class="fa fa-trash"></i></button>`,
-
       };
     }),
   };
@@ -432,27 +431,28 @@ async function getVideoImage(id) {
   });
 }
 
-function getStreamList() {
+async function getStreamList() {
   // 从后端获取摄像头列表（axiox)
-  axios.get("/videolistquery").then((res) => {
+  await axios.get("/videolistquery").then((res) => {
     console.log(res);
     globaldata.StreamList = res.data;
   });
 }
 
-updateStream = function () {
+async function updateStream() {
+  await
   axios
     .post("/videolistupdate", {
       videoid: document.getElementById("upstreamid").value,
       streamname: document.getElementById("upstreamname").value,
       stream: document.getElementById("upstreamurl").value,
     })
-    .then((res) => {
+    .then(async (res) => {
       console.log(res);
       if (res.data == "Success") {
         alert("修改成功");
         updatemodal.hide();
-        getStreamList();
+        await getStreamList();
         videotable.update(CalcVideoData(), { loading: true });
       } else {
         alert("修改失败");
@@ -464,18 +464,18 @@ updateStream = function () {
     });
 };
 
-addStream = function () {
-  axios
+async function addStream() {
+  await axios
     .post("/videolistadd", {
       streamname: document.getElementById("streamname").value,
       stream: document.getElementById("streamurl").value,
     })
-    .then((res) => {
+    .then(async (res) => {
       console.log(res);
       if (res.data == "Success") {
         alert("添加成功");
         addmodal.hide();
-        getStreamList();
+        await getStreamList();
         videotable.update(CalcVideoData(), { loading: true });
       } else {
         alert("添加失败");
@@ -487,16 +487,16 @@ addStream = function () {
     });
 };
 
-function deleteStream(id) {
-  axios
+async function deleteStream(id) {
+  await axios
     .post("/videolistdelete", {
       videoid: id,
     })
-    .then((res) => {
+    .then(async (res) => {
       console.log(res);
       if (res.data == "Success") {
         alert("删除成功");
-        getStreamList();
+        await getStreamList();
         videotable.update(CalcVideoData(), { loading: true });
       } else {
         alert("删除失败");
@@ -506,9 +506,9 @@ function deleteStream(id) {
       videotable.update(CalcVideoData(), { loading: false });
     });
 }
-function getUserList() {
+async function getUserList() {
   // 从后端获取用户列表（axiox)
-  axios.get("/userlistquery").then((res) => {
+  await axios.get("/userlistquery").then((res) => {
     console.log(res);
     globaldata.UserList = res.data;
   });
@@ -536,3 +536,5 @@ function getUser() {
     globaldata.User = res.data[0];
   });
 }
+
+
