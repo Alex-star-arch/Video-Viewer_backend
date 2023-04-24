@@ -382,7 +382,6 @@ function CalcUserData() {
         operation: `
     <button class="update-btn btn btn-outline-primary btn-floating btn-sm" data-mdb-id="${row.id}"><i class="fas fa-edit"></i></button>
     <button class="delete-btn btn ms-2 btn-danger btn-floating btn-sm" data-mdb-id="${row.id}"><i class="fa fa-trash"></i></button>`,
-
       };
     }),
   };
@@ -437,10 +436,11 @@ function getStreamList() {
   axios.get("/videolistquery").then((res) => {
     console.log(res);
     globaldata.StreamList = res.data;
+    videotable.update(CalcVideoData());
   });
 }
 
-updateStream = function () {
+function updateStream() {
   axios
     .post("/videolistupdate", {
       videoid: document.getElementById("upstreamid").value,
@@ -453,18 +453,13 @@ updateStream = function () {
         alert("修改成功");
         updatemodal.hide();
         getStreamList();
-        videotable.update(CalcVideoData(), { loading: true });
       } else {
         alert("修改失败");
       }
-    })
-    .then(() => {
-      videotable.update(CalcVideoData(), { loading: false });
-      console.count("updateStream");
     });
-};
+}
 
-addStream = function () {
+function addStream() {
   axios
     .post("/videolistadd", {
       streamname: document.getElementById("streamname").value,
@@ -476,16 +471,11 @@ addStream = function () {
         alert("添加成功");
         addmodal.hide();
         getStreamList();
-        videotable.update(CalcVideoData(), { loading: true });
       } else {
         alert("添加失败");
       }
-    })
-    .then(() => {
-      videotable.update(CalcVideoData(), { loading: false });
-      console.count("addStream");
     });
-};
+}
 
 function deleteStream(id) {
   axios
@@ -497,13 +487,9 @@ function deleteStream(id) {
       if (res.data == "Success") {
         alert("删除成功");
         getStreamList();
-        videotable.update(CalcVideoData(), { loading: true });
       } else {
         alert("删除失败");
       }
-    })
-    .then(() => {
-      videotable.update(CalcVideoData(), { loading: false });
     });
 }
 function getUserList() {
