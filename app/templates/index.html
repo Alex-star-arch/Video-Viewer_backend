@@ -6,8 +6,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
   <meta http-equiv="x-ua-compatible" content="ie=edge" />
   <title>Video-Viewer</title>
-  <!-- MDB icon -->
-  <link rel="icon" href="img/mdb-favicon.ico" type="image/x-icon" />
   <!-- Font Awesome -->
   <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.2/css/all.css" />
   <!-- Google Fonts Roboto -->
@@ -35,7 +33,7 @@
   <!-- Start your project here-->
   <!-- Button trigger modal -->
 
-  <!-- Modal -->
+   <!-- Modal -->
   <div class="modal fade" id="addmodal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
@@ -122,6 +120,41 @@
       </div>
     </div>
   </div>
+
+  <!-- Modal -->
+  <div class="modal fade" id="usermodal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">修改用户</h5>
+          <button type="button" class="btn-close" data-mdb-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="input-group flex-nowrap my-2">
+            <span class="input-group-text">用户ID</span>
+            <input type="text" id="upuserid" class="form-control" placeholder="ID" aria-label="ID"
+              aria-describedby="addon-wrapping" disabled />
+          </div>
+          <div class="input-group flex-nowrap my-2">
+            <span class="input-group-text">用户名</span>
+            <input type="text" id="upusername" class="form-control" placeholder="ID" aria-label="ID"
+              aria-describedby="addon-wrapping" disabled />
+          </div>
+          <div class="input-group flex-nowrap my-2">
+            <span class="input-group-text">角色</span>
+            <select class="select" id="upuserrole">
+              <option value="0">用户</option>
+              <option value="1">管理员</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-mdb-dismiss="modal">关闭</button>
+          <button type="button" class="btn btn-primary" onclick="updateStream()">保存</button>
+        </div>
+      </div>
+    </div>
+  </div>
   <!-- Sidenav -->
 
   <nav id="Side-nav" class="sidenav bg-dark" data-mdb-color="light" data-mdb-expandable="false" data-mdb-mode="side"
@@ -151,10 +184,10 @@
         <a class="sidenav-link p-5">
           <i class="fas fa-user-alt fa-2x mx-3"></i><span>用户管理</span></a>
       </li>
-      <li class="sidenav-item my-3" id="UserPannel" onclick="Router(this)" data-route="UserManage">
-        <a class="sidenav-link p-5">
-          <i class="fas fa-user-alt fa-2x mx-3"></i><span>用户信息</span></a>
-      </li>
+<!--      <li class="sidenav-item my-3" id="UserPannel" onclick="Router(this)" data-route="UserManage">-->
+<!--        <a class="sidenav-link p-5">-->
+<!--          <i class="fas fa-user-alt fa-2x mx-3"></i><span>用户信息</span></a>-->
+<!--      </li>-->
     </ul>
   </nav>
   <!-- Sidenav -->
