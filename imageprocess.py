@@ -13,15 +13,14 @@ class Database:
     def __init__(self):
         self.cursor = None
 
-
-    def create_slx(self, tablename):  # 创建图片表格
+    def createPicture(self, tablename):  # 创建图片表格
         connection = _connect()
         self.cursor = connection.cursor()
         try:
             sql = """
                 CREATE TABLE IF NOT EXISTS %s(
 
-                id        INT(11)        NOT NULL,
+                id        INT(11)        NOT NULL PRIMARY KEY AUTO_INCREMENT,
                 streamnum   VARCHAR(255) NOT NULL,
                 date      DATETIME       NOT NULL,
                 image      longblob
@@ -33,7 +32,7 @@ class Database:
         finally:
             connection.close()
 
-    def insert_image(self):  # 将文件夹内所有图像全部插入数据库，插入完成后删除图像
+    def addImage(self):  # 将文件夹内所有图像全部插入数据库，插入完成后删除图像
         connection = _connect()
         self.cursor = connection.cursor()
         try:
@@ -44,39 +43,24 @@ class Database:
                     name_parts = filename.split('.')
                     # 获取test1部分的数字
                     streamnum = ''.join(filter(str.isdigit, name_parts[0]))
-                    sql1 = """SELECT count(*) FROM picture"""
-                    self.cursor.execute(sql1)
-                    count = self.cursor.fetchone()[0]
-                    id = count + 1
-                    sql2 = "insert into picture(id, streamnum, date, image) values(%s,%s,%s,%s)"
                     date = datetime.now()
+                    sql2 = "insert into picture(id,streamnum, date, image) values(0,%s,%s,%s)"
                     with open(os.path.join(folder_path, filename), 'rb') as f:
                         image_data = f.read()
                     image_base64 = base64.b64encode(image_data).decode('utf-8')
                     image = f'data:image/jpeg;base64,{image_base64}'
-                    imagee = (id, streamnum, date, image)
+                    imagee = (streamnum, date, image)
                     self.cursor.execute(sql2, imagee)
                     connection.commit()
                     os.remove(os.path.join(folder_path, filename))
         finally:
             connection.close()
 
-    def get_image(self, where_condition):
+    def getAllImage(self, VideoId):
         connection = _connect()
         self.cursor = connection.cursor()
         try:
-            sql = """select * from picture where %s""" % where_condition
-            self.cursor.execute(sql)
-            image = self.cursor.fetchone()[2]
-            return image.decode()
-        finally:
-            connection.close()
-
-    def get_onevideoimage(self, where_condition):
-        connection = _connect()
-        self.cursor = connection.cursor()
-        try:
-            sql = """select image from picture where %s ORDER BY id DESC LIMIT 20""" % where_condition
+            sql = """select image from picture where %s ORDER BY id DESC LIMIT 20""" % VideoId
             self.cursor.execute(sql)
             images = self.cursor.fetchall()
             decoded_images = []
@@ -89,13 +73,13 @@ class Database:
         finally:
             connection.close()
 
-    def create_slxstream(self, tablename):  # 创建表格
+    def createStream(self, tablename):  # 创建表格
         connection = _connect()
         self.cursor = connection.cursor()
         try:
             sql = """
                 CREATE TABLE IF NOT EXISTS %s(
-                id            INT(11)          NOT NULL,
+                id            INT(11)          NOT NULL PRIMARY KEY AUTO_INCREMENT,
                 streamname    VARCHAR(255)     NOT NULL,
                 stream        VARCHAR(255)     NOT NULL,
                 datetime       VARCHAR(255)        NOT NULL
@@ -106,17 +90,13 @@ class Database:
         finally:
             connection.close()
 
-    def insert_stream(self, streamname, stream):
+    def addStream(self, streamname, stream):
         connection = _connect()
         self.cursor = connection.cursor()
         try:
             try:
-                sql1 = """SELECT count(*) FROM streams"""
-                self.cursor.execute(sql1)
-                count = self.cursor.fetchone()[0]
-                id = count + 1
+                sql = "insert into streams(id,streamname, stream,datetime) values(0,%s,%s,%s)"
                 print('--now-')
-                sql = "insert into streams(id,streamname, stream,datetime) values(%s,%s,%s,%s)"
                 now = datetime.now()
                 print(now)
                 print('--cn_date--')
@@ -124,7 +104,7 @@ class Database:
                 print(cn_date)
                 print('======')
                 print(cn_date)
-                stm = (id, streamname, stream, cn_date)
+                stm = (streamname, stream, cn_date)
                 self.cursor.execute(sql, stm)
                 connection.commit()
                 return 'Success'
@@ -133,18 +113,8 @@ class Database:
         finally:
             connection.close()
 
-    def get_stream(self, where_condition):
-        connection = _connect()
-        self.cursor = connection.cursor()
-        try:
-            sql = """select * from streams where %s""" % where_condition
-            self.cursor.execute(sql)
-            streams = self.cursor.fetchone()[1]
-            return streams
-        finally:
-            connection.close()
-
-    def get_allstream(self):
+    def getStreamUrl(self):
+        # 获取流地址
         connection = _connect()
         self.cursor = connection.cursor()
         try:
@@ -160,23 +130,27 @@ class Database:
         finally:
             connection.close()
 
-    def delete_stream(self, video_id):
+    def deleteStream(self, video_id):
+        # 删除流
         connection = _connect()
         self.cursor = connection.cursor()
         try:
-            try:
-                sql = """DELETE FROM streams WHERE id=%s""" % video_id
-                self.cursor.execute(sql)
-                sql1 = """update streams set id=id-1 where id>%s""" % video_id
-                self.cursor.execute(sql1)
+            # 先查询video_id是否存在,存在则删除
+            sql = """select * from streams where id = %s"""
+            self.cursor.execute(sql, video_id)
+            result = self.cursor.fetchall()
+            if result:
+                sql = """delete from streams where id = %s"""
+                self.cursor.execute(sql, video_id)
                 connection.commit()
                 return 'Success'
-            except:
+            else:
                 return 'Fail'
         finally:
             connection.close()
 
-    def update_stream(self, updateid, updatestreamname, updatestream):
+    def updateStream(self, updateid, updatestreamname, updatestream):
+        # 更新流
         connection = _connect()
         self.cursor = connection.cursor()
         try:
@@ -191,7 +165,8 @@ class Database:
         finally:
             connection.close()
 
-    def streamlistquery(self):
+    def getAllStream(self):
+        # 获取所有流
         connection = _connect()
         self.cursor = connection.cursor()
         try:
@@ -202,18 +177,15 @@ class Database:
             for row in streams:
                 # 创建一个空字典
                 # cn_date = row[3].strftime("%Y年%m月%d日 %H时%M分%S秒")
-                temp_dict = {}
+                temp_dict = {"id": row[0], "streamname": row[1], "stream": row[2], "datetime": row[3]}
                 # 将每个列和相应的值添加到字典中
-                temp_dict["id"] = row[0]
-                temp_dict["streamname"] = row[1]
-                temp_dict["stream"] = row[2]
-                temp_dict["datetime"] = row[3]
                 data.append(temp_dict)
             return data
         finally:
             connection.close()
 
-    def userlistquery(self):
+    def getAllUser(self):
+        # 获取所有用户
         connection = _connect()
         self.cursor = connection.cursor()
         try:
@@ -222,40 +194,89 @@ class Database:
             users = self.cursor.fetchall()
             data = []
             for row in users:
-                temp_dict = {}
+                temp_dict = {"id": row[0], "username": row[1], "role": row[6]}
                 # 将每个列和相应的值添加到字典中
-                temp_dict["id"] = row[0]
-                temp_dict["username"] = row[1]
-                temp_dict["role"] = row[6]
                 data.append(temp_dict)
             return data
         finally:
             connection.close()
 
-    def admin(self, current_user):
+    def getUser(self, current_user):
+        # 获取当前用户
         connection = _connect()
         self.cursor = connection.cursor()
         try:
-            sql = """select email from user WHERE username = %s"""
+            sql = """select * from user where username = %s"""
             values = current_user
             self.cursor.execute(sql, values)
-            email = self.cursor.fetchone()[0]
-            sql1 = """select phone from user WHERE username = %s"""
-            values1 = current_user
-            self.cursor.execute(sql1, values1)
-            phone = self.cursor.fetchone()[0]
-            sql2 = """select username from user WHERE username = %s"""
-            values2 = current_user
-            self.cursor.execute(sql2, values2)
-            username = self.cursor.fetchone()[0]
+            user = self.cursor.fetchone()
             data = []
-            temp_dict = {}
+            temp_dict = {"id": user[0], "username": user[1], "email": user[2], "phone": user[3], "role": user[6]}
             # 将每个列和相应的值添加到字典中
-            temp_dict["username"] = username
-            temp_dict["email"] = email
-            temp_dict["phone"] = phone
             data.append(temp_dict)
             return data
+        finally:
+            connection.close()
+
+    def updateUser(self, updateid, updateusername, updateemail, updatephone, updatestatus):
+        # 更新用户
+        connection = _connect()
+        self.cursor = connection.cursor()
+        try:
+            try:
+                sql = """update user set username= %s, email = %s, phone = %s, status = %s where id=%s"""
+                values = (updateusername, updateemail, updatephone, updatestatus, updateid)
+                self.cursor.execute(sql, values)
+                connection.commit()
+                return 'Success'
+            except:
+                return 'Fail'
+        finally:
+            connection.close()
+
+    def login(self, username, password):
+        # 登录
+        connection = _connect()
+        self.cursor = connection.cursor()
+        try:
+            sql = """select * from user where username = %s and password = %s"""
+            values = (username, password)
+            self.cursor.execute(sql, values)
+            result = self.cursor.fetchone()
+            if result:
+                return 'Success'
+            else:
+                return 'Fail'
+        finally:
+            connection.close()
+
+    def register(self, username, password, email, phone, status, fullname):
+        # 注册
+        connection = _connect()
+        self.cursor = connection.cursor()
+        try:
+            try:
+
+                sql = "insert into user(username, password, email, phone,status,fullname) values(%s,%s,%s,%s,%s,%s)"
+                stm = (username, password, email, phone, status, fullname)
+                self.cursor.execute(sql, stm)
+                connection.commit()
+                return 'Success'
+            except:
+                return 'Fail'
+        finally:
+            connection.close()
+
+    def getUserRole(self, username):
+        # 获取用户角色
+        connection = _connect()
+        self.cursor = connection.cursor()
+        try:
+            sql = """select status from user where username = %s"""
+            values = username
+            self.cursor.execute(sql, values)
+            result = self.cursor.fetchone()
+            return result
         finally:
             connection.close()
 
@@ -268,5 +289,5 @@ def read_image(filepath):
 
 
 database = Database()
-database.create_slx("picture")
-database.create_slxstream("streams")
+database.createPicture("picture")
+database.createStream("streams")

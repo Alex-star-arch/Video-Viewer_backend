@@ -1,23 +1,10 @@
 # flask-saas-platform
 ## 简介
-flask-saas-platform是一个Python环境下的WEB后台管理系统脚手架，目标是用极少量的代码，快速构建小型WEB应用。请勿在大中型项目中进行尝试。  
-
-1. 使用较传统的重后端+轻前端的方式，降低总体代码量
-2. Web框架使用Flask，默认Jinja模版
-3. ORM框架使用Peewee
-4. 前端套用基于BootStrap的AdminLTE模板
+视频监控系统
 
 ## 系统截图
-- 登录页  
-
-
-- 主页  
-
-
-- 编辑界面  
-
-
-- 查询界面  
+- 登录页
+- 主页
 
 
 
