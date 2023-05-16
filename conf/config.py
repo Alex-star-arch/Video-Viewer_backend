@@ -16,10 +16,10 @@ class Config:
     # SQLALCHEMY_DATABASE_URI = "mysql://root:123456@127.0.0.1:3306/test"  # 3.11
     # SQLALCHEMY_TRACK_MODIFICATIONS = False  # 是否追踪数据库的修改 #3.11
 
-
     @staticmethod
     def init_app(app):
         pass
+
 
 class DevelopmentConfig(Config):
     DEBUG = True
@@ -39,4 +39,3 @@ config = {
     'production': ProductionConfig,
     'default': DevelopmentConfig
 }
-

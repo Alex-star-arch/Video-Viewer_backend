@@ -4,36 +4,37 @@ import pymysql
 from datetime import datetime
 
 
+def _connect():
+    return pymysql.connect(host="localhost", user="root", password="root", database="video",
+                           charset='utf8', use_unicode=True, max_allowed_packet=24 * 1024 * 1024 * 1024)
 
-class Database():
+
+class Database:
     def __init__(self):
         self.cursor = None
 
-    def _connect(self):
-        return pymysql.connect(host="localhost", user="root", password="root", database="video",
-                               charset='utf8', use_unicode=True, max_allowed_packet=24 * 1024 * 1024 * 1024)
 
     def create_slx(self, tablename):  # 创建图片表格
-        connection = self._connect()
+        connection = _connect()
         self.cursor = connection.cursor()
         try:
             sql = """
                 CREATE TABLE IF NOT EXISTS %s(
-    
+
                 id        INT(11)        NOT NULL,
                 streamnum   VARCHAR(255) NOT NULL,
                 date      DATETIME       NOT NULL,
                 image      longblob
-    
+
                 )CHARACTER SET utf8 COLLATE utf8_general_ci
-                """ % (tablename)
+                """ % tablename
             self.cursor.execute(sql)
             connection.commit()
         finally:
             connection.close()
 
     def insert_image(self):  # 将文件夹内所有图像全部插入数据库，插入完成后删除图像
-        connection = self._connect()
+        connection = _connect()
         self.cursor = connection.cursor()
         try:
             folder_path = 'app/static/images/picture'  # 文件夹路径
@@ -61,10 +62,10 @@ class Database():
             connection.close()
 
     def get_image(self, where_condition):
-        connection = self._connect()
+        connection = _connect()
         self.cursor = connection.cursor()
         try:
-            sql = """select * from picture where %s""" % (where_condition)
+            sql = """select * from picture where %s""" % where_condition
             self.cursor.execute(sql)
             image = self.cursor.fetchone()[2]
             return image.decode()
@@ -72,24 +73,24 @@ class Database():
             connection.close()
 
     def get_onevideoimage(self, where_condition):
-        connection = self._connect()
+        connection = _connect()
         self.cursor = connection.cursor()
         try:
-            sql = """select image from picture where %s ORDER BY id DESC LIMIT 20""" % (where_condition)
+            sql = """select image from picture where %s ORDER BY id DESC LIMIT 20""" % where_condition
             self.cursor.execute(sql)
             images = self.cursor.fetchall()
             decoded_images = []
             for image in images:
                 image_data = base64.b64decode(image[0])
                 decoded_image = base64.b64encode(image_data).decode('utf-8')
-                decoded_image=decoded_image.replace('dataimage/jpegbase64', '')
+                decoded_image = decoded_image.replace('dataimage/jpegbase64', '')
                 decoded_images.append(decoded_image)
             return decoded_images
         finally:
             connection.close()
 
     def create_slxstream(self, tablename):  # 创建表格
-        connection = self._connect()
+        connection = _connect()
         self.cursor = connection.cursor()
         try:
             sql = """
@@ -98,15 +99,15 @@ class Database():
                 streamname    VARCHAR(255)     NOT NULL,
                 stream        VARCHAR(255)     NOT NULL,
                 datetime       VARCHAR(255)        NOT NULL
-    
+
                 )CHARACTER SET utf8 COLLATE utf8_general_ci
-                """ % (tablename)
+                """ % tablename
             self.cursor.execute(sql)
         finally:
             connection.close()
 
     def insert_stream(self, streamname, stream):
-        connection = self._connect()
+        connection = _connect()
         self.cursor = connection.cursor()
         try:
             try:
@@ -133,10 +134,10 @@ class Database():
             connection.close()
 
     def get_stream(self, where_condition):
-        connection = self._connect()
+        connection = _connect()
         self.cursor = connection.cursor()
         try:
-            sql = """select * from streams where %s""" % (where_condition)
+            sql = """select * from streams where %s""" % where_condition
             self.cursor.execute(sql)
             streams = self.cursor.fetchone()[1]
             return streams
@@ -144,7 +145,7 @@ class Database():
             connection.close()
 
     def get_allstream(self):
-        connection = self._connect()
+        connection = _connect()
         self.cursor = connection.cursor()
         try:
             sql = """select stream from streams"""
@@ -160,13 +161,13 @@ class Database():
             connection.close()
 
     def delete_stream(self, video_id):
-        connection = self._connect()
+        connection = _connect()
         self.cursor = connection.cursor()
         try:
             try:
-                sql = """DELETE FROM streams WHERE id=%s""" % (video_id)
+                sql = """DELETE FROM streams WHERE id=%s""" % video_id
                 self.cursor.execute(sql)
-                sql1 = """update streams set id=id-1 where id>%s""" % (video_id)
+                sql1 = """update streams set id=id-1 where id>%s""" % video_id
                 self.cursor.execute(sql1)
                 connection.commit()
                 return 'Success'
@@ -176,7 +177,7 @@ class Database():
             connection.close()
 
     def update_stream(self, updateid, updatestreamname, updatestream):
-        connection = self._connect()
+        connection = _connect()
         self.cursor = connection.cursor()
         try:
             try:
@@ -191,7 +192,7 @@ class Database():
             connection.close()
 
     def streamlistquery(self):
-        connection = self._connect()
+        connection = _connect()
         self.cursor = connection.cursor()
         try:
             sql = """select * from streams"""
@@ -213,7 +214,7 @@ class Database():
             connection.close()
 
     def userlistquery(self):
-        connection = self._connect()
+        connection = _connect()
         self.cursor = connection.cursor()
         try:
             sql = """select * from user"""
@@ -231,25 +232,25 @@ class Database():
         finally:
             connection.close()
 
-    def admin(self,current_user):
-        connection = self._connect()
+    def admin(self, current_user):
+        connection = _connect()
         self.cursor = connection.cursor()
         try:
             sql = """select email from user WHERE username = %s"""
-            values = (current_user)
+            values = current_user
             self.cursor.execute(sql, values)
             email = self.cursor.fetchone()[0]
             sql1 = """select phone from user WHERE username = %s"""
-            values1 = (current_user)
+            values1 = current_user
             self.cursor.execute(sql1, values1)
             phone = self.cursor.fetchone()[0]
             sql2 = """select username from user WHERE username = %s"""
-            values2 = (current_user)
+            values2 = current_user
             self.cursor.execute(sql2, values2)
             username = self.cursor.fetchone()[0]
             data = []
             temp_dict = {}
-                # 将每个列和相应的值添加到字典中
+            # 将每个列和相应的值添加到字典中
             temp_dict["username"] = username
             temp_dict["email"] = email
             temp_dict["phone"] = phone
@@ -257,6 +258,7 @@ class Database():
             return data
         finally:
             connection.close()
+
 
 def read_image(filepath):
     with open(filepath, 'rb') as f:
