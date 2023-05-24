@@ -1,36 +1,30 @@
 import json
-
 import requests
 from flask import render_template, request, jsonify
-from flask_login import login_required, current_user
-
-from app import get_logger, get_config
 from imageprocess import *
 from . import main
 
-logger = get_logger(__name__)
-cfg = get_config()
-
 
 # 根目录跳转
+from ..utils import parse_jwt
+
+
 @main.route('/', methods=['GET'])
-@login_required
 def root():
     return render_template('auth/login.html')
 
 
 # 首页
 @main.route('/index', methods=['GET'])
-@login_required
 def index():
-    return render_template('index.html', current_user=current_user)
+    return render_template('index.html')
 
 
 # 返回所有视频流
 @main.route('/allvideolist', methods=['GET'])
 def allvideolist():
-    getallstream = jsonify(database.getStreamUrl())
-    return getallstream
+    getallstream = database.getStreamUrl()
+    return {'code': 200, 'msg': '获取成功', 'data': getallstream}
 
 
 # 返回视频分析图片流
@@ -38,20 +32,20 @@ def allvideolist():
 def videoimage():
     database.addImage()
     video_id = request.args.get('videoid')
-    video_id = 'streamnum=' + video_id
-    pictures = database.getAllImage(video_id)
-    return jsonify(pictures)
+    pictures = database.getImage(video_id)
+    return {'code': 200, 'msg': '获取成功', 'data': pictures}
 
 
 # 增加视频流
 @main.route('/videolistadd', methods=['POST'])
 def videolistadd():
-    # streamname = request.form.get('streamname')
-    # stream = request.form.get('stream')
     streamname = json.loads(request.get_data().decode('utf-8'))['streamname']
     stream = json.loads(request.get_data().decode('utf-8'))['stream']
     result = database.addStream(streamname, stream)
-    return jsonify(result)
+    if result == 'Fail':
+        return {'code': 400, 'msg': '添加失败'}
+    else:
+        return {'code': 200, 'msg': '添加成功'}
 
 
 # 删除视频流
@@ -59,7 +53,10 @@ def videolistadd():
 def videolistdelete():
     video_id = json.loads(request.get_data().decode('utf-8'))['videoid']
     result = database.deleteStream(video_id)
-    return jsonify(result)
+    if result == 'Fail':
+        return {'code': 400, 'msg': '删除失败'}
+    else:
+        return {'code': 200, 'msg': '删除成功'}
 
 
 # 视频流列表修改
@@ -69,14 +66,17 @@ def videolistupdate():
     updatestreamname = json.loads(request.get_data().decode('utf-8'))['streamname']
     updatestream = json.loads(request.get_data().decode('utf-8'))['stream']
     result = database.updateStream(updateid, updatestreamname, updatestream)
-    return jsonify(result)
+    if result == 'Fail':
+        return {'code': 400, 'msg': '修改失败'}
+    else:
+        return {'code': 200, 'msg': '修改成功'}
 
 
 # 视频流列表查询
 @main.route('/videolistquery', methods=['GET'])
 def videolistquery():
     result = database.getAllStream()
-    return jsonify(result)
+    return {'code': 200, 'msg': '查询成功', 'data': result}
 
 
 # 设置时钟
@@ -91,36 +91,44 @@ def addClock():
     url = "http://127.0.0.1:5001/clock"
     r = requests.post(url, form)
     # result = database.streamlistquery()
-    return "success"
+    return {'code': 200, 'msg': '设置成功'}
 
 
 # 用户列表查询
-@main.route('/userlistquery', methods=['GET'])
+@main.route('/userlistquery', methods=['POST'])
 def userlistquery():
-    result = database.getAllUser()
-    return jsonify(result)
+    # 检验JWT
+    # bearer token
+    token = request.headers.get('Authorization').split(' ')[1]
+    payload = parse_jwt(token)
+    if payload is None:
+        return {'code': 400, 'msg': '请先登录'}
+    else:
+        role = payload['role']
+        if role != 'admin':
+            return {'code': 400, 'msg': '您没有权限'}
+        else:
+            result = database.getAllUser()
+            return {'code': 200, 'msg': '查询成功', 'data': result}
 
+@main.route('/imagelistquery', methods=['GET'])
+def imagelistquery():
+    result = database.getAllImage()
+    if result == 'Fail':
+        return {'code': 400, 'msg': '查询失败'}
+    else:
+        return {'code': 200, 'msg': '查询成功', 'data': result}
 
 # 用户界面
-@main.route('/admin', methods=['GET'])
+@main.route('/userrole', methods=['POST'])
 # @login_required
-def admin():
-    file = open("user.txt", "r")
-    # 读取整个文件内容
-    text = file.read()
-    # 关闭文件
-    file.close()
-    # 打印读取的字符串
-    print(text)
-    result = database.getUser(text)
-    return jsonify(result)
-# except:
-#     file = open("user.txt", "r")
-#     # 读取整个文件内容
-#     text = file.read()
-#     # 关闭文件
-#     file.close()
-#     # 打印读取的字符串
-#     # print(text)
-#     # result = database.admin(text)
-#     return jsonify(text)
+def userrole():
+    token = request.headers.get('Authorization').split(' ')[1]
+    payload = parse_jwt(token)
+    if payload is None:
+        return {'code': 400, 'msg': '请先登录'}
+    else:
+        useranme = payload['username']
+        result = database.getUserRole(useranme)
+        return {'code': 200, 'msg': '查询成功', 'data': result}
+

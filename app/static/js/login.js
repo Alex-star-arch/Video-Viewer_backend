@@ -1,13 +1,17 @@
 function login(){
     axios.post('/login', {
-        email: document.getElementById('email').value,
+        username: document.getElementById('username').value,
         password: document.getElementById('password').value
     })
     .then(function (response) {
-        if(response.data == 'success'){
-            window.location.href = 'index.html';
+        if(response.data.code === 200){
+            console.log(response.data.data.token)
+            localStorage.setItem('token', response.data.data.token)
+            console.log(localStorage.getItem('token'))
+            window.location.href = '/index';
+
         }else{
-            alert('Invalid email or password');
+            alert('用户名或密码错误');
         }
     }
     )

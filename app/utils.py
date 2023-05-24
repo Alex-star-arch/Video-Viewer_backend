@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 
+import datetime
 import html
 import json
-import datetime
 from urllib.parse import unquote
-from app.models import CfgNotify
+import jwt
 from flask import Response, flash
-import math
-
+from conf.config import Config
+secret=Config.SECRET_KEY
 
 ## 字符串转字典
 def str_to_dict(dict_str):
@@ -78,15 +78,6 @@ def jsonresp(jsonobj=None, status=200, errinfo=None):
         return Response('{"errinfo":"%s"}' % (errinfo,), mimetype='application/json', status=status)
 
 
-# 通过名称获取PEEWEE模型
-def get_model_by_name(model_name):
-    if model_name == 'notifies':
-        DynamicModel = CfgNotify
-    else:
-        DynamicModel = None
-    return DynamicModel
-
-
 # JSON中时间格式处理
 def datetime_handler(x):
     if isinstance(x, datetime.datetime):
@@ -94,66 +85,12 @@ def datetime_handler(x):
     raise TypeError("Unknown type")
 
 
-# wtf表单转peewee模型
-def form_to_model(form, model):
-    for wtf in form:
-        model.__setattr__(wtf.name, wtf.data)
-    return model
+# 生成JWT
+def gen_jwt(payload, secret=secret, algorithm='HS256'):
+    return jwt.encode(payload, secret, algorithm=algorithm)
 
 
-# peewee模型转表单
-def model_to_form(model, form):
-    dict = obj_to_dict(model)
-    form_key_list = [k for k in form.__dict__]
-    for k, v in dict.items():
-        if k in form_key_list and v:
-            field = form.__getitem__(k)
-            field.data = v
-            form.__setattr__(k, field)
+# 解析JWT
+def parse_jwt(token, secret=secret, algorithm='HS256'):
+    return jwt.decode(token, secret, algorithms=algorithm)
 
-
-def flash_errors(form):
-    for field, errors in form.errors.items():
-        for error in errors:
-            flash("字段 [%s] 格式有误,错误原因: %s" % (
-                getattr(form, field).label.text,
-                error
-            ))
-
-# //小渔村的分页，不知道能不能用到
-def Pagination(page_num,totals):
-    ret = {"prev_page": page_num - 1,
-           "next_page": page_num + 1,
-           "current_page": 0,
-           "total_pages": 0,
-           "max_page": 0,
-           "page_size": 10,
-           "totals": totals,
-           "offset": 0,
-           "page_range": None
-           }
-
-    ret["total_pages"] = math.ceil(totals / ret["page_size"])
-    ret["max_page"] = ret["total_pages"]
-
-
-    if page_num <= 1:
-        page_num = 1
-        ret["prev_page"] = 1
-    if page_num >= ret["max_page"]:
-        page_num = ret["max_page"]
-        ret["next_page"] = ret["max_page"]
-
-    ret["current_page"] = page_num
-
-    if totals == 0:
-        ret["offset"] = 0
-    else:
-        ret["offset"] = (ret["current_page"] - 1) * ret["page_size"]
-
-    page_range = []
-    for i in range(1,ret["max_page"]+1):
-        page_range.append(i)
-    ret["page_range"] = page_range
-
-    return ret

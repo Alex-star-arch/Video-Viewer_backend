@@ -17,7 +17,7 @@ main{
     width: calc(100vw-240px);
     overflow: hidden;
 }
-.list-group-item{
+.black-list{
     background: #404040;
     color: #fff;
     border: 1px solid #fff;

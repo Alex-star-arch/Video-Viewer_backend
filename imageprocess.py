@@ -13,7 +13,8 @@ class Database:
     def __init__(self):
         self.cursor = None
 
-    def createPicture(self, tablename):  # 创建图片表格
+    def createPictureTable(self, TableName):
+        # 创建图片表，如果存在则不创建
         connection = _connect()
         self.cursor = connection.cursor()
         try:
@@ -26,13 +27,14 @@ class Database:
                 image      longblob
 
                 )CHARACTER SET utf8 COLLATE utf8_general_ci
-                """ % tablename
+                """ % TableName
             self.cursor.execute(sql)
             connection.commit()
         finally:
             connection.close()
 
-    def addImage(self):  # 将文件夹内所有图像全部插入数据库，插入完成后删除图像
+    def addImage(self):
+        # 将文件夹内所有图像全部插入数据库，插入完成后删除图像
         connection = _connect()
         self.cursor = connection.cursor()
         try:
@@ -56,12 +58,13 @@ class Database:
         finally:
             connection.close()
 
-    def getAllImage(self, VideoId):
+    def getImage(self, VideoId):
+        # 获取VideoId对应的所有图像
         connection = _connect()
         self.cursor = connection.cursor()
         try:
-            sql = """select image from picture where %s ORDER BY id DESC LIMIT 20""" % VideoId
-            self.cursor.execute(sql)
+            sql = """select image from picture where streamnum = %s"""
+            self.cursor.execute(sql, VideoId)
             images = self.cursor.fetchall()
             decoded_images = []
             for image in images:
@@ -73,7 +76,8 @@ class Database:
         finally:
             connection.close()
 
-    def createStream(self, tablename):  # 创建表格
+    def createStreamTable(self, TableName):
+        # 创建流表，如果存在则不创建
         connection = _connect()
         self.cursor = connection.cursor()
         try:
@@ -85,12 +89,13 @@ class Database:
                 datetime       VARCHAR(255)        NOT NULL
 
                 )CHARACTER SET utf8 COLLATE utf8_general_ci
-                """ % tablename
+                """ % TableName
             self.cursor.execute(sql)
         finally:
             connection.close()
 
     def addStream(self, streamname, stream):
+        # 将流插入数据库
         connection = _connect()
         self.cursor = connection.cursor()
         try:
@@ -234,7 +239,7 @@ class Database:
         finally:
             connection.close()
 
-    def login(self, username, password):
+    def checkUser(self, username, password):
         # 登录
         connection = _connect()
         self.cursor = connection.cursor()
@@ -244,13 +249,17 @@ class Database:
             self.cursor.execute(sql, values)
             result = self.cursor.fetchone()
             if result:
-                return 'Success'
+                # 如果是管理员
+                if result[6] == 1:
+                    return 'admin'
+                else:
+                    return 'user'
             else:
                 return 'Fail'
         finally:
             connection.close()
 
-    def register(self, username, password, email, phone, status, fullname):
+    def registerUser(self, username, password, email='none', phone='none', status=0, fullname='normal_user'):
         # 注册
         connection = _connect()
         self.cursor = connection.cursor()
@@ -280,6 +289,25 @@ class Database:
         finally:
             connection.close()
 
+    def getAllImage(self):
+        # 获取所有图片
+        connection = _connect()
+        self.cursor = connection.cursor()
+        try:
+            sql = """select * from picture"""
+            self.cursor.execute(sql)
+            images = self.cursor.fetchall()
+            data = []
+            for row in images:
+                image_data = base64.b64decode(row[3])
+                decoded_image = base64.b64encode(image_data).decode('utf-8')
+                decoded_image = decoded_image.replace('dataimage/jpegbase64', '')
+                temp_dict = {"id": row[0], "streamnum": row[1], "datetime": row[2], "image": decoded_image, }
+                # 将每个列和相应的值添加到字典中
+                data.append(temp_dict)
+            return data
+        finally:
+            connection.close()
 
 def read_image(filepath):
     with open(filepath, 'rb') as f:
@@ -289,5 +317,5 @@ def read_image(filepath):
 
 
 database = Database()
-database.createPicture("picture")
-database.createStream("streams")
+database.createPictureTable("picture")
+database.createStreamTable("streams")
