@@ -13,6 +13,9 @@ from ..utils import parse_jwt
 def root():
     return render_template('auth/login.html')
 
+@main.route('/usercreate', methods=['GET'])
+def usercreate():
+    return render_template('auth/register.html')
 
 # 首页
 @main.route('/index', methods=['GET'])

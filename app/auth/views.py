@@ -28,7 +28,7 @@ def login():
 def register():
     username = json.loads(request.get_data().decode('utf-8'))['username']
     password = json.loads(request.get_data().decode('utf-8'))['password']
-    if database.checkUser(username, password) != 'Fail':
+    if database.isUserExist(username) != 'Fail':
         return {'code': 400, 'msg': '用户名已存在'}
     else:
         database.registerUser(username, password)

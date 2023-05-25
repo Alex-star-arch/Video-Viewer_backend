@@ -259,6 +259,22 @@ class Database:
         finally:
             connection.close()
 
+    def isUserExist(self, username):
+        # 判断用户是否存在
+        connection = _connect()
+        self.cursor = connection.cursor()
+        try:
+            sql = """select * from user where username = %s"""
+            values = username
+            self.cursor.execute(sql, values)
+            result = self.cursor.fetchone()
+            if result:
+                return 'Success'
+            else:
+                return 'Fail'
+        finally:
+            connection.close()
+
     def registerUser(self, username, password, email='none', phone='none', status=0, fullname='normal_user'):
         # 注册
         connection = _connect()

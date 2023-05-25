@@ -83,7 +83,7 @@ Router = async function (Data) {
             break;
         case "VideoAnysis":
             if (!VideoId) getVideoImage(0);
-            else await getVideoImage(VideoId);
+            else getVideoImage(VideoId);
             globaldata.VideoAnysisList.VideoUrl = globaldata.VideoUrlList[VideoId];
             loadPage(VideoAnysisPage(globaldata.VideoAnysisList));
             break;

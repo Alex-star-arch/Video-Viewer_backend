@@ -10,10 +10,10 @@ function register() {
             password: password
         })
             .then(function (response) {
-                    if (response.data == 'success') {
-                        window.location.href = 'login.html';
+                    if (response.data.code === 200) {
+                        window.location.href = '/';
                     } else {
-                        alert('注册失败！');
+                        alert(response.data.msg);
                     }
                 }
             )
