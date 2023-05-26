@@ -5,12 +5,6 @@ const globaldata = {
         VideoAnysisImage: [],
     },
     StreamList: [
-        {
-            datetime: "Thu, 23 Mar 2023 23:02:31 GMT",
-            id: 1,
-            stream: "http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4",
-            streamname: "第三区",
-        },
     ],
     User: {
         username: "",
@@ -25,8 +19,8 @@ const globaldata = {
         },
     ],
     UserColumn: [
-        {label: "用户名", field: "username"},
         {label: "ID", field: "id"},
+        {label: "用户名", field: "username"},
         {label: "角色", field: "role"},
         {label: "操作", field: "operation", sort: false},
     ],
@@ -196,32 +190,20 @@ function UserManageInit() {
         document.getElementsByClassName("update-btn").forEach((btn) => {
             btn.addEventListener("click", () => {
                 let id = btn.attributes["data-mdb-id"].value;
+                id=parseInt(id);
                 console.log(`update User ${id}`);
-                document.getElementById("upuserid").value = globaldata.UserList.find(
+                let user=globaldata.UserList.find(
                     (item) => {
                         return item.id === id;
                     }
-                ).id;
-                document.getElementById("upusername").value = globaldata.UserList.find(
-                    (item) => {
-                        return item.id === id;
-                    }
-                ).username;
-                document.getElementById("upuserrole").value = globaldata.UserList.find(
-                    (item) => {
-                        return item.id === id;
-                    }
-                ).role;
+                );
+                document.getElementById("upuserid").value = user.id;
+                document.getElementById("upusername").value = user.username;
+                document.getElementById("upuserrole").value = user.role;
                 usermodal.show();
             });
         });
     };
-
-    document.querySelector("#add-btn").addEventListener("click", () => {
-        console.log("add");
-        document.getElementById("streamid").value = "无需填写";
-        addmodal.show();
-    });
 
     userDatatable.addEventListener("render.mdb.datatable", setActions);
 
@@ -295,6 +277,8 @@ function getStreamList() {
     axios.get("/videolistquery").then((res) => {
         if (res.data.code === 200) {
             globaldata.StreamList = res.data.data;
+            globaldata.StreamList.forEach((item) => {
+            });
             if (videotable !== null) videotable.update(CalcVideoData());
         } else {
             console.log(res.data.msg);
@@ -364,6 +348,10 @@ function getUserList() {
     axios.post("/userlistquery",).then((res) => {
         if (res.data.code === 200) {
             globaldata.UserList = res.data.data;
+            globaldata.UserList.forEach((item) => {
+                if(item.role === 1) item.role = "管理员";
+                else item.role = "用户";
+            });
             if (usertable !== null) usertable.update(CalcUserData());
         } else {
             console.log(res.data.msg);

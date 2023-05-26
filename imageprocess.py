@@ -305,6 +305,22 @@ class Database:
         finally:
             connection.close()
 
+    def updateUserRole(self, userid, role):
+        # 更新用户角色
+        connection = _connect()
+        self.cursor = connection.cursor()
+        try:
+            try:
+                sql = """update user set status = %s where id=%s"""
+                values = (role, userid)
+                self.cursor.execute(sql, values)
+                connection.commit()
+                return 'Success'
+            except:
+                return 'Fail'
+        finally:
+            connection.close()
+
     def getAllImage(self):
         # 获取所有图片
         connection = _connect()

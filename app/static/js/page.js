@@ -97,11 +97,11 @@ function UserManagePage() {
         </div>
       </div>
       <div class="card-body">
-        <div class="my-2">
-          <button type="button" class="btn btn-primary" id="add-btn">
-            <i class="fas fa-plus"></i>
-          </button>
-        </div>
+<!--        <div class="my-2">-->
+<!--          <button type="button" class="btn btn-primary" id="add-btn">-->
+<!--            <i class="fas fa-plus"></i>-->
+<!--          </button>-->
+<!--        </div>-->
         <div id="usertable" data-mdb-stripped="true" data-mdb-max-height="80vh" data-mdb-max-width="100vw"></div>
       </div>
     </div>

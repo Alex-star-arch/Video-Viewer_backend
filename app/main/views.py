@@ -114,6 +114,28 @@ def userlistquery():
             result = database.getAllUser()
             return {'code': 200, 'msg': '查询成功', 'data': result}
 
+@main.route('/userlistupdate', methods=['POST'])
+def userlistupdate():
+    # 检验JWT
+    # bearer token
+    token = request.headers.get('Authorization').split(' ')[1]
+    payload = parse_jwt(token)
+    if payload is None:
+        return {'code': 400, 'msg': '请先登录'}
+    else:
+        role = payload['role']
+        if role != 'admin':
+            return {'code': 400, 'msg': '您没有权限'}
+        else:
+            updateid = json.loads(request.get_data().decode('utf-8'))['userid']
+            updaterole = json.loads(request.get_data().decode('utf-8'))['role']
+            print(updateid, updaterole)
+            result = database.updateUserRole(updateid, updaterole)
+            if result == 'Fail':
+                return {'code': 400, 'msg': '修改失败'}
+            else:
+                return {'code': 200, 'msg': '修改成功'}
+
 @main.route('/imagelistquery', methods=['GET'])
 def imagelistquery():
     result = database.getAllImage()
