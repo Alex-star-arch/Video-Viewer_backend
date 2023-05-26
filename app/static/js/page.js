@@ -97,11 +97,6 @@ function UserManagePage() {
         </div>
       </div>
       <div class="card-body">
-<!--        <div class="my-2">-->
-<!--          <button type="button" class="btn btn-primary" id="add-btn">-->
-<!--            <i class="fas fa-plus"></i>-->
-<!--          </button>-->
-<!--        </div>-->
         <div id="usertable" data-mdb-stripped="true" data-mdb-max-height="80vh" data-mdb-max-width="100vw"></div>
       </div>
     </div>
@@ -155,7 +150,7 @@ function ImageManagePage(ImageList) {
             </ul>
         </div>
       <div class="card-footer text-muted">
-        <a href="#!" class="btn btn-danger">删除</a>
+        <button class="btn btn-danger" data-imageid="${ImageList[i].id}" onclick="deleteImage(this)">删除</button>
       </div>
     </div>
   `;

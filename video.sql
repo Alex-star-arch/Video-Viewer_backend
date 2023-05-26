@@ -11,7 +11,7 @@
  Target Server Version : 80025
  File Encoding         : 65001
 
- Date: 25/05/2023 11:25:17
+ Date: 27/05/2023 00:59:01
 */
 
 SET NAMES utf8mb4;
@@ -43,17 +43,19 @@ INSERT INTO `picture` VALUES (6, '4', '2023-03-23 20:03:42', 0x2F396A2F344141515
 -- ----------------------------
 DROP TABLE IF EXISTS `streams`;
 CREATE TABLE `streams`  (
-  `id` int NOT NULL,
+  `id` int NOT NULL AUTO_INCREMENT,
   `streamname` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
   `stream` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
-  `datetime` datetime NOT NULL
+  `datetime` datetime NOT NULL,
+  PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of streams
 -- ----------------------------
 INSERT INTO `streams` VALUES (1, '222', '333', '2023-05-23 17:29:07');
-INSERT INTO `streams` VALUES (0, '123', '123', '2023-05-24 20:30:40');
+INSERT INTO `streams` VALUES (4, '111', '222', '2023-05-23 17:29:07');
+INSERT INTO `streams` VALUES (5, '111', '333', '2023-05-27 00:57:38');
 
 -- ----------------------------
 -- Table structure for user
@@ -68,14 +70,15 @@ CREATE TABLE `user`  (
   `phone` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,
   `status` tinyint(1) NOT NULL,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 15 CHARACTER SET = latin1 COLLATE = latin1_swedish_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 18 CHARACTER SET = latin1 COLLATE = latin1_swedish_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of user
 -- ----------------------------
 INSERT INTO `user` VALUES (6, 'nihao', '123', 'zero', '1', '1', 1);
 INSERT INTO `user` VALUES (14, 'Ghoster', '123456', 'user', 'none', 'none', 1);
-INSERT INTO `user` VALUES (15, 'admin', '123456', 'normal_user', 'none', 'none', 0);
+INSERT INTO `user` VALUES (15, 'admin', '123456', 'normal_user', 'none', 'none', 1);
 INSERT INTO `user` VALUES (16, 'testuser', '123456', 'normal_user', 'none', 'none', 0);
+INSERT INTO `user` VALUES (17, 'test', '123456', 'normal_user', 'none', 'none', 0);
 
 SET FOREIGN_KEY_CHECKS = 1;

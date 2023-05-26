@@ -66,7 +66,7 @@ function init() {
 
 init();
 
-Router = async function (Data) {
+Router = function (Data) {
     let Link = Data.getAttribute("data-route");
     let VideoId = Data.getAttribute("data-video");
     // console.log(Link, VideoId);
@@ -414,10 +414,30 @@ function getAllImage() {
     axios.get("/imagelistquery").then((res) => {
         if (res.data.code === 200) {
             globaldata.ImageList = res.data.data;
+             loadPage(ImageManagePage(globaldata.ImageList));
         } else {
             console.log(res.data.msg);
         }
     });
+}
+
+function deleteImage(dom) {
+    // 删除图片（axios)
+    let id = dom.getAttribute("data-imageid");
+    console.log(`delete image ${id}` );
+    axios
+        .post("/imagelistdelete", {
+            imageid: id,
+        })
+        .then((res) => {
+            console.log(res);
+            if (res.data.code === 200) {
+                alert("删除成功");
+                getAllImage();
+            } else {
+                alert("删除失败");
+            }
+        });
 }
 
 function tologin() {

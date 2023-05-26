@@ -144,6 +144,16 @@ def imagelistquery():
     else:
         return {'code': 200, 'msg': '查询成功', 'data': result}
 
+@main.route('/imagelistdelete', methods=['POST'])
+def imagelistdelete():
+    image_id = json.loads(request.get_data().decode('utf-8'))['imageid']
+    print(image_id)
+    result = database.deleteImage(image_id)
+    if result == 'Fail':
+        return {'code': 400, 'msg': '删除失败'}
+    else:
+        return {'code': 200, 'msg': '删除成功'}
+
 # 用户界面
 @main.route('/userrole', methods=['POST'])
 # @login_required

@@ -341,6 +341,22 @@ class Database:
         finally:
             connection.close()
 
+    def deleteImage(self, id):
+        # 删除图片
+        connection = _connect()
+        self.cursor = connection.cursor()
+        try:
+            try:
+                sql = """delete from picture where id = %s"""
+                values = id
+                self.cursor.execute(sql, values)
+                connection.commit()
+                return 'Success'
+            except:
+                return 'Fail'
+        finally:
+            connection.close()
+
 def read_image(filepath):
     with open(filepath, 'rb') as f:
         data = f.read()
