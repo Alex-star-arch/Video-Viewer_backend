@@ -73,6 +73,9 @@ class Database:
                 decoded_image = decoded_image.replace('dataimage/jpegbase64', '')
                 decoded_images.append(decoded_image)
             return decoded_images
+        except:
+            print("getImageError")
+            return []
         finally:
             connection.close()
 
@@ -132,6 +135,9 @@ class Database:
                 stream = ''.join(stream)
                 streamlist.append(stream)
             return streamlist
+        except:
+            print("getStreamUrlError")
+            return []
         finally:
             connection.close()
 
@@ -186,6 +192,8 @@ class Database:
                 # 将每个列和相应的值添加到字典中
                 data.append(temp_dict)
             return data
+        except:
+            return [];
         finally:
             connection.close()
 

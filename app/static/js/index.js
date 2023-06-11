@@ -52,6 +52,12 @@ const timepickerMaxMin = new mdb.Timepicker(pickerInline, {
     format24: true,
     inline: true,
 });
+const collapseElementList = [].slice.call(document.querySelectorAll('.collapse'))
+const collapseList = collapseElementList.map((collapseEl) => {
+  return new mdb.Collapse(collapseEl, {
+    toggle: false,
+  });
+});
 
 function init() {
     const sidenav = document.getElementById("Side-nav");
@@ -73,6 +79,7 @@ Router = function (Data) {
     // console.log(Data);
     switch (Link) {
         case "VideoFlow":
+            collapseHide();
             loadPage(VideoFlowPage(globaldata.VideoUrlList));
             break;
         case "VideoAnysis":
@@ -82,14 +89,17 @@ Router = function (Data) {
             loadPage(VideoAnysisPage(globaldata.VideoAnysisList));
             break;
         case "VideoManage":
+            collapseHide();
             loadPage(VideoManagePage());
             videotable = VideoManageInit();
             break;
         case "UserManage":
+            collapseHide();
             loadPage(UserManagePage());
             usertable = UserManageInit();
             break;
         case "UserPannel":
+            collapseHide();
             loadPage(UserPannelPage(globaldata.User));
             break;
         case "ImageManage":
@@ -442,4 +452,15 @@ function deleteImage(dom) {
 
 function tologin() {
     window.location.href = "http://127.0.0.1:5000/login?next=%2F";
+}
+
+function collapseShow(){
+    collapseList.forEach(item=>{
+        item.show();
+    })
+}
+function collapseHide(){
+    collapseList.forEach(item=>{
+        item.hide();
+    })
 }
