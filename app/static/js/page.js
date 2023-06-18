@@ -10,7 +10,6 @@ function VideoFlowPage(VideoUrlList) {
           <source src="${VideoUrlList[i]}" type="video/mp4">
           <source src="../static/video/defult.mp4" type="video/mp4">
           </video>
-          <!-- <img src="${VideoUrlList[i]}" class="img-fluid" alt="Wild Landscape" /> -->
         </div>
       `;
         page += InnerContent;
