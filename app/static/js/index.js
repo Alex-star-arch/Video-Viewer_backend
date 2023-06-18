@@ -165,7 +165,6 @@ function VideoManageInit() {
         entriesOptions: [5, 10, 15],
         fixedHeader: true,
     };
-
     const basicData = CalcVideoData();
     const TableInstance = new mdb.Datatable(
         document.getElementById("datatable"),
