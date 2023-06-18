@@ -62,12 +62,12 @@ const collapseList = collapseElementList.map((collapseEl) => {
 function init() {
     const sidenav = document.getElementById("Side-nav");
     const sidenavInstance = mdb.Sidenav.getInstance(sidenav);
-    sidenavInstance.show();
     getVideoList();
     getStreamList();
     getUser();
     getUserList();
     getAllImage();
+    sidenavInstance.show();
 }
 
 init();
@@ -397,6 +397,9 @@ function getUser() {
     axios.post("/userrole").then((res) => {
         if (res.data.code === 200) {
             globaldata.User = res.data.data;
+            if(globaldata.User[0] === 0){
+                document.getElementById('UserManage').innerHTML = "";
+            }
         } else {
             console.log(res.data.msg);
         }
