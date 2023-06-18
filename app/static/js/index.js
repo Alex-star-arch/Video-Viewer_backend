@@ -77,11 +77,6 @@ Router = function (Data) {
     let VideoId = Data.getAttribute("data-video");
     // console.log(Link, VideoId);
     // console.log(Data);
-    getVideoList();
-    getStreamList();
-    getUser();
-    getUserList();
-    getAllImage();
     switch (Link) {
         case "VideoFlow":
             collapseHide();
@@ -292,6 +287,7 @@ function getStreamList() {
     axios.get("/videolistquery").then((res) => {
         if (res.data.code === 200) {
             globaldata.StreamList = res.data.data;
+            getVideoList()
             globaldata.StreamList.forEach((item) => {
             });
             if (videotable !== null) videotable.update(CalcVideoData());
