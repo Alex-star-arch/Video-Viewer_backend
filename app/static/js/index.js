@@ -77,6 +77,11 @@ Router = function (Data) {
     let VideoId = Data.getAttribute("data-video");
     // console.log(Link, VideoId);
     // console.log(Data);
+    getVideoList();
+    getStreamList();
+    getUser();
+    getUserList();
+    getAllImage();
     switch (Link) {
         case "VideoFlow":
             collapseHide();
