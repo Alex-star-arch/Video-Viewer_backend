@@ -211,6 +211,8 @@ class Database:
                 # 将每个列和相应的值添加到字典中
                 data.append(temp_dict)
             return data
+        except:
+            return [];
         finally:
             connection.close()
 

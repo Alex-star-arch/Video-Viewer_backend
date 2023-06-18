@@ -1,12 +1,14 @@
 function VideoFlowPage(VideoUrlList) {
+    debugger;
     let page = `
     <div class="row m-0" style="">
     `;
     for (let i = 0; i < VideoUrlList.length; i++) {
         let InnerContent = `
-      <div  class="col-3 p-0" onclick="Router(this)" data-route="VideoAnysis" data-video="${i}">
+      <div  class="col-4 p-0" onclick="Router(this)" data-route="VideoAnysis" data-video="${i}">
         <video autoplay style="width:100%;height: 100%;">
           <source src="${VideoUrlList[i]}" type="video/mp4">
+          <source src="../static/video/defult.mp4" type="video/mp4">
           </video>
           <!-- <img src="${VideoUrlList[i]}" class="img-fluid" alt="Wild Landscape" /> -->
         </div>

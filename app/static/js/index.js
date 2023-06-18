@@ -80,12 +80,13 @@ Router = function (Data) {
     switch (Link) {
         case "VideoFlow":
             collapseHide();
-            loadPage(VideoFlowPage(globaldata.VideoUrlList));
+            debugger
+            loadPage(VideoFlowPage(globaldata.VideoList));
             break;
         case "VideoAnysis":
             if (!VideoId) getVideoImage(0);
             else getVideoImage(VideoId);
-            globaldata.VideoAnysisList.VideoUrl = globaldata.VideoUrlList[VideoId];
+            globaldata.VideoAnysisList.VideoUrl = globaldata.VideoList[VideoId];
             loadPage(VideoAnysisPage(globaldata.VideoAnysisList));
             break;
         case "VideoManage":
@@ -120,7 +121,7 @@ function VideoManageInit() {
         // 视频流更新按钮
         document.getElementsByClassName("update-btn").forEach((btn) => {
             btn.addEventListener("click", () => {
-                let id = btn.attributes["data-mdb-id"].value;
+                let id = parseInt(btn.attributes["data-mdb-id"].value);
                 console.log(`update Stream ${id}`);
                 document.getElementById("upstreamid").value =
                     globaldata.StreamList.find((item) => item.id === id).id;
