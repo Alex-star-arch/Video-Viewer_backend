@@ -1,5 +1,4 @@
 function VideoFlowPage(VideoUrlList) {
-    debugger;
     let page = `
     <div class="row m-0" style="">
     `;

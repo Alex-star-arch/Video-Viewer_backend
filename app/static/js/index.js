@@ -80,7 +80,6 @@ Router = function (Data) {
     switch (Link) {
         case "VideoFlow":
             collapseHide();
-            debugger
             loadPage(VideoFlowPage(globaldata.VideoList));
             break;
         case "VideoAnysis":
