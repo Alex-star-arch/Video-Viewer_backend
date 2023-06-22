@@ -5,7 +5,7 @@ function VideoFlowPage(VideoUrlList) {
     for (let i = 0; i < VideoUrlList.length; i++) {
         let InnerContent = `
       <div  class="col-4 p-0" onclick="Router(this)" data-route="VideoAnysis" data-video="${i}">
-        <video autoplay style="width:100%;height: 100%;">
+        <video autoplay muted style="width:100%;height: 100%;">
           <source src="${VideoUrlList[i]}" type="video/mp4">
           <source src="../static/video/defult.mp4" type="video/mp4">
           </video>
@@ -23,6 +23,7 @@ function VideoAnysisPage(VideoAnysisList) {
       <div class="col-9 p-0" id="VideoViewer">
         <video autoplay controls style="width:100%;height: 100%;">
           <source src="${VideoAnysisList.VideoUrl}" type="video/mp4">
+            <source src="../static/video/defult.mp4" type="video/mp4">
         </video>
         <!-- <img src="${VideoAnysisList.VideoUrl}" class="img-fluid" alt="Wild Landscape" /> -->
         <div class="p-4 d-flex" id="BottomBar">

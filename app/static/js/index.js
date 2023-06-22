@@ -1,18 +1,16 @@
 const globaldata = {
     VideoUrlList: [],
     VideoAnysisList: {
-        VideoUrl: "http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4",
+        VideoUrl: "",
         VideoAnysisImage: [],
     },
-    StreamList: [
-    ],
+    StreamList: [],
     User: {
         username: "",
         id: "",
         role: "",
     },
-    UserList: [
-    ],
+    UserList: [],
     UserColumn: [
         {label: "ID", field: "id"},
         {label: "用户名", field: "username"},
@@ -49,9 +47,9 @@ const timepickerMaxMin = new mdb.Timepicker(pickerInline, {
 });
 const collapseElementList = [].slice.call(document.querySelectorAll('.collapse'))
 const collapseList = collapseElementList.map((collapseEl) => {
-  return new mdb.Collapse(collapseEl, {
-    toggle: false,
-  });
+    return new mdb.Collapse(collapseEl, {
+        toggle: false,
+    });
 });
 
 function init() {
@@ -67,7 +65,7 @@ function init() {
 
 init();
 
-Router = function (Data) {
+Router = async function (Data) {
     let Link = Data.getAttribute("data-route");
     let VideoId = Data.getAttribute("data-video");
     // console.log(Link, VideoId);
@@ -78,23 +76,23 @@ Router = function (Data) {
             loadPage(VideoFlowPage(globaldata.VideoList));
             break;
         case "VideoAnysis":
-            if (!VideoId) getVideoImage(0);
-            else getVideoImage(VideoId);
+            if (!VideoId) await getVideoImage(0);
+            else await getVideoImage(VideoId);
             globaldata.VideoAnysisList.VideoUrl = globaldata.VideoList[VideoId];
             loadPage(VideoAnysisPage(globaldata.VideoAnysisList));
             break;
         case "VideoManage":
             collapseHide();
+            //await getStreamList()
             loadPage(VideoManagePage());
             videotable = VideoManageInit();
             break;
         case "UserManage":
             collapseHide();
+            //await getUserList();
             loadPage(UserManagePage());
             usertable = UserManageInit();
-            if(globaldata.User.role !== 1){
-                // document.getElementById("add-btn").style.display = "none";
-                // document.getElementById("add-btn").style.visibility = "hidden";
+            if (globaldata.User.role !== 1) {
                 alert("您没有权限进行此操作！")
             }
             break;
@@ -177,7 +175,7 @@ function VideoManageInit() {
 
 // 计算视频流数据
 function CalcVideoData() {
-    let VideoData = {
+    return VideoData = {
         columns: [...globaldata.StreamColumn],
         rows: [...globaldata.StreamList].map((row) => {
             return {
@@ -188,7 +186,6 @@ function CalcVideoData() {
             };
         }),
     };
-    return VideoData;
 }
 
 //初始化用户表格
@@ -199,9 +196,9 @@ function UserManageInit() {
         document.getElementsByClassName("update-btn").forEach((btn) => {
             btn.addEventListener("click", () => {
                 let id = btn.attributes["data-mdb-id"].value;
-                id=parseInt(id);
+                id = parseInt(id);
                 console.log(`update User ${id}`);
-                let user=globaldata.UserList.find(
+                let user = globaldata.UserList.find(
                     (item) => {
                         return item.id === id;
                     }
@@ -245,7 +242,7 @@ function UserManageInit() {
 
 // 计算用户数据
 function CalcUserData() {
-    let UserData = {
+    return UserData = {
         columns: [...globaldata.UserColumn],
         rows: [...globaldata.UserList].map((row) => {
             return {
@@ -255,7 +252,6 @@ function CalcUserData() {
             };
         }),
     };
-    return UserData;
 }
 
 function getVideoList() {
@@ -269,10 +265,10 @@ function getVideoList() {
     });
 }
 
-function getVideoImage(id) {
+async function getVideoImage(id) {
     // 从后端获取视频分析图像（axios)
     id = parseInt(id) + 1;
-    axios.get("/videoimage?videoid=" + id).then((res) => {
+    await axios.get("/videoimage?videoid=" + id).then((res) => {
         if (res.data.code === 200) {
             globaldata.VideoAnysisList.VideoAnysisImage = [...res.data.data];
         } else {
@@ -281,14 +277,14 @@ function getVideoImage(id) {
     });
 }
 
-function getStreamList() {
+async function getStreamList() {
     // 从后端获取视频流列表（axios)
-    axios.get("/videolistquery").then((res) => {
+    await axios.get("/videolistquery").then((res) => {
         if (res.data.code === 200) {
             globaldata.StreamList = res.data.data;
             getVideoList()
-            globaldata.StreamList.forEach((item) => {
-            });
+            // globaldata.StreamList.forEach((item) => {
+            // });
             if (videotable !== null) videotable.update(CalcVideoData());
         } else {
             console.log(res.data.msg);
@@ -352,14 +348,14 @@ function deleteStream(id) {
         });
 }
 
-function getUserList() {
+async function getUserList() {
     // 从后端获取用户列表（axios)
     axios.defaults.headers.common['Authorization'] = 'Bearer ' + globaldata.Token;
-    axios.post("/userlistquery",).then((res) => {
+    await axios.post("/userlistquery",).then((res) => {
         if (res.data.code === 200) {
             globaldata.UserList = res.data.data;
             globaldata.UserList.forEach((item) => {
-                if(item.role === 1) item.role = "管理员";
+                if (item.role === 1) item.role = "管理员";
                 else item.role = "用户";
             });
             if (usertable !== null) usertable.update(CalcUserData());
@@ -424,7 +420,7 @@ function getAllImage() {
     axios.get("/imagelistquery").then((res) => {
         if (res.data.code === 200) {
             globaldata.ImageList = res.data.data;
-             loadPage(ImageManagePage(globaldata.ImageList));
+            loadPage(ImageManagePage(globaldata.ImageList));
         } else {
             console.log(res.data.msg);
         }
@@ -434,7 +430,7 @@ function getAllImage() {
 function deleteImage(dom) {
     // 删除图片（axios)
     let id = dom.getAttribute("data-imageid");
-    console.log(`delete image ${id}` );
+    console.log(`delete image ${id}`);
     axios
         .post("/imagelistdelete", {
             imageid: id,
@@ -454,13 +450,13 @@ function tologin() {
     window.location.href = "http://127.0.0.1:5000/login?next=%2F";
 }
 
-function collapseShow(){
-    collapseList.forEach(item=>{
-        item.show();
-    })
-}
-function collapseHide(){
-    collapseList.forEach(item=>{
+// function collapseShow(){
+//     collapseList.forEach(item=>{
+//         item.show();
+//     })
+// }
+function collapseHide() {
+    collapseList.forEach(item => {
         item.hide();
     })
 }
