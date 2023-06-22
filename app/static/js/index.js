@@ -12,11 +12,6 @@ const globaldata = {
         role: "",
     },
     UserList: [
-        {
-            username: "admin",
-            id: "1",
-            role: "1",
-        },
     ],
     UserColumn: [
         {label: "ID", field: "id"},
@@ -97,6 +92,11 @@ Router = function (Data) {
             collapseHide();
             loadPage(UserManagePage());
             usertable = UserManageInit();
+            if(globaldata.User.role !== 1){
+                // document.getElementById("add-btn").style.display = "none";
+                // document.getElementById("add-btn").style.visibility = "hidden";
+                alert("您没有权限进行此操作！")
+            }
             break;
         case "UserPannel":
             collapseHide();
@@ -395,10 +395,7 @@ function getUser() {
     axios.defaults.headers.common['Authorization'] = 'Bearer ' + globaldata.Token;
     axios.post("/userrole").then((res) => {
         if (res.data.code === 200) {
-            globaldata.User = res.data.data;
-            if(globaldata.User[0] === 0){
-                document.getElementById('UserManage').innerHTML = "";
-            }
+            globaldata.User.role = res.data.data[0];
         } else {
             console.log(res.data.msg);
         }
