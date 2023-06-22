@@ -312,6 +312,8 @@ class Database:
             self.cursor.execute(sql, values)
             result = self.cursor.fetchone()
             return result
+        except:
+            return 0
         finally:
             connection.close()
 
