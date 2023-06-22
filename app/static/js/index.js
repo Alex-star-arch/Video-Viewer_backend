@@ -418,9 +418,9 @@ function addClock() {
     });
 }
 
-function getAllImage() {
+async function getAllImage() {
     // 获取所有图片（axios)
-    axios.get("/imagelistquery").then((res) => {
+    await axios.get("/imagelistquery").then((res) => {
         if (res.data.code === 200) {
             globaldata.ImageList = res.data.data;
         } else {
@@ -437,11 +437,12 @@ function deleteImage(dom) {
         .post("/imagelistdelete", {
             imageid: id,
         })
-        .then((res) => {
+        .then(async (res) => {
             console.log(res);
             if (res.data.code === 200) {
                 alert("删除成功");
-                getAllImage();
+                await getAllImage();
+                loadPage(ImageManagePage(globaldata.ImageList));
             } else {
                 alert("删除失败");
             }
