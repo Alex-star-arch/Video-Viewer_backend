@@ -59,7 +59,10 @@ function init() {
     getStreamList();
     getUser();
     getUserList();
+    setTimeout(() => {
     getAllImage();
+    },2000)
+    //getAllImage();
     sidenavInstance.show();
 }
 
@@ -420,7 +423,6 @@ function getAllImage() {
     axios.get("/imagelistquery").then((res) => {
         if (res.data.code === 200) {
             globaldata.ImageList = res.data.data;
-            loadPage(ImageManagePage(globaldata.ImageList));
         } else {
             console.log(res.data.msg);
         }
@@ -447,9 +449,8 @@ function deleteImage(dom) {
 }
 
 function tologin() {
-    window.location.href = "http://127.0.0.1:5000/login?next=%2F";
+    window.location.href = "http://127.0.0.1:8080";
 }
-
 // function collapseShow(){
 //     collapseList.forEach(item=>{
 //         item.show();

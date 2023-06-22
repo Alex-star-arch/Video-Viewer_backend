@@ -136,7 +136,6 @@ class Database:
                 streamlist.append(stream)
             return streamlist
         except:
-            print("getStreamUrlError")
             return []
         finally:
             connection.close()
