@@ -94,7 +94,7 @@ def addClock():
     url = "http://127.0.0.1:5001/clock"
     r = requests.post(url, form)
     # result = database.streamlistquery()
-    return {'code': 200, 'msg': '设置成功'}
+    return {'code': 200, 'msg': 'success'}
 
 
 # 用户列表查询

@@ -413,7 +413,7 @@ function addClock() {
     form.append("minute", minute);
     axios.post("/addClock", form).then((res) => {
         console.log(res);
-        if (res.data === "success") {
+        if (res.data.msg === "success") {
             alert("设置成功");
         }
     });
