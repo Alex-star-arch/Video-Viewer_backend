@@ -207,7 +207,7 @@ function VideoAnalyseInit() {
                     // console.log("errorType", errorType);
                     // console.log("errorDetail", errorDetail);
                     // console.log("errorInfo", errorInfo);
-                    console.log(i,"号视频流已断开");
+                    console.log("视频流已断开");
                     flvPlayer.pause();
                     flvPlayer.unload();
                     flvPlayer.detachMediaElement();
