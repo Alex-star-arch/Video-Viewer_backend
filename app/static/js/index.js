@@ -142,6 +142,20 @@ function VideoFlowInit() {
                 flvPlayer.attachMediaElement(video);
                 flvPlayer.load();
                 flvPlayer.play();
+                 flvPlayer.on(flvjs.Events.ERROR, (errorType, errorDetail, errorInfo)=>{
+                    // console.log("errorType", errorType);
+                    // console.log("errorDetail", errorDetail);
+                    // console.log("errorInfo", errorInfo);
+                    console.log(i,"号视频流已断开");
+                    flvPlayer.pause();
+                    flvPlayer.unload();
+                    flvPlayer.detachMediaElement();
+                    flvPlayer.destroy();
+                    flvPlayer=null;
+                    const videoRealId=globaldata.StreamList.find((item)=>item.stream===globaldata.VideoList[i]).id;
+                    globaldata.offLineList.push(videoRealId);
+
+                });
                 flvPlayer.on(flvjs.Events.STATISTICS_INFO, (res) => {
                     if(res.speed===0)offLineCount++;
                     if(offLineCount>20){
@@ -188,6 +202,20 @@ function VideoAnalyseInit() {
                     flvPlayer.destroy();
                     flvPlayer=null;
                 }
+                });
+            flvPlayer.on(flvjs.Events.ERROR, (errorType, errorDetail, errorInfo)=>{
+                    // console.log("errorType", errorType);
+                    // console.log("errorDetail", errorDetail);
+                    // console.log("errorInfo", errorInfo);
+                    console.log(i,"号视频流已断开");
+                    flvPlayer.pause();
+                    flvPlayer.unload();
+                    flvPlayer.detachMediaElement();
+                    flvPlayer.destroy();
+                    flvPlayer=null;
+                    const videoRealId=globaldata.StreamList.find((item)=>item.stream===globaldata.VideoList[i]).id;
+                    globaldata.offLineList.push(videoRealId);
+
                 });
         }
     }
