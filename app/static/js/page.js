@@ -8,7 +8,7 @@ function VideoFlowPage(VideoUrlList) {
         const src=isRTSP?`ws://localhost:8888/rtsp/${i}/?url=`+VideoUrlList[i]:VideoUrlList[i];
         let InnerContent = `
       <div  class="col-4 p-0" onclick="Router(this)" data-route="VideoAnysis" data-video="${i}">
-        <video autoplay muted loop style="width:100%;height: 100%;" id="Video-preview-${i}" data-protocol="${isRTSP?"RTSP":"HTTP"}" data-src="${src}">
+        <video autoplay muted loop poster="../static/assets/img/loading.gif" style="width:100%;height: 100%;object-fit: cover;max-height: 320px" id="Video-preview-${i}" data-protocol="${isRTSP?"RTSP":"HTTP"}" data-src="${src}">
           <source src="${VideoUrlList[i]}" type="video/mp4">
           <source src="../static/assets/video/defult.mp4" type="video/mp4">
           </video>
@@ -26,7 +26,7 @@ function VideoAnalysePage(VideoAnalyseList,VideoIndex) {
     let page = `
     <div class="row m-0">
       <div class="col-9 p-0" id="VideoViewer">
-        <video autoplay controls style="width:100%;height: 100%;" id="Video-analyse" data-protocol="${isRTSP?"RTSP":"HTTP"}" data-src="${src}">
+        <video autoplay controls poster="../static/assets/img/loading.gif" style="width:100%;height: 100%;object-fit: cover;" id="Video-analyse" data-protocol="${isRTSP?"RTSP":"HTTP"}" data-src="${src}">
           <source src="${VideoAnalyseList.VideoUrl}" type="video/mp4">
            <source src="../static/assets/video/defult.mp4" type="video/mp4">
         </video>

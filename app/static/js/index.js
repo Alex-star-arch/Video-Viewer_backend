@@ -84,7 +84,7 @@ Router = async function (Data) {
             VideoFlowInit();
             break;
         case "VideoAnysis":
-            const VideoRealId=globaldata.StreamList.find((item)=>item.stream===globaldata.VideoList[VideoId]).id;
+            const VideoRealId = globaldata.StreamList.find((item) => item.stream === globaldata.VideoList[VideoId]).id;
             if (!VideoId) await getVideoImage(0);
             else await getVideoImage(VideoRealId);
             globaldata.VideoAnalyseList.VideoUrl = globaldata.VideoList[VideoId];
@@ -107,7 +107,8 @@ Router = async function (Data) {
             }
             break;
         case "ImageManage":
-            loadPage(ImageManagePage(globaldata.ImageList,globaldata.User.role));
+            await getVideoImage(0);
+            loadPage(ImageManagePage(globaldata.ImageList, globaldata.User.role));
             break;
         case "WarnManage":
             loadPage(WarnManagePage());
@@ -129,16 +130,22 @@ function VideoFlowInit() {
             console.log(`RTSP ${video.dataset.src}`);
             if (flvjs.isSupported()) {
                 const flvPlayer = flvjs.createPlayer({
-                type: 'flv',
-                url: video.dataset.src,
-                isLive: true,
-            }, {
-                enableStashBuffer: false,
-                reuseRedirectedURL: true,
-            });
+                    type: 'flv',
+                    url: video.dataset.src,
+                    isLive: true,
+                }, {
+                    enableStashBuffer: false,
+                    reuseRedirectedURL: true,
+                });
                 flvPlayer.attachMediaElement(video);
                 flvPlayer.load();
                 flvPlayer.play();
+                flvPlayer.on(flvjs.Events.ERROR, (errorType, errorDetail, errorInfo) => {
+                    console.log("视频错误信息回调")
+                    console.log("errorType:", errorType);
+                    console.log("errorDetail:", errorDetail);
+                    console.log("errorInfo:", errorInfo);
+                });
             }
         }
 
@@ -161,6 +168,12 @@ function VideoAnalyseInit() {
             flvPlayer.attachMediaElement(video);
             flvPlayer.load();
             flvPlayer.play();
+              flvPlayer.on(flvjs.Events.ERROR, (errorType, errorDetail, errorInfo) => {
+                  console.log("视频错误信息回调")
+                  console.log("errorType:", errorType);
+                  console.log("errorDetail:", errorDetail);
+                  console.log("errorInfo:", errorInfo);
+                })
         }
     }
 }
@@ -235,7 +248,7 @@ function CalcVideoData() {
                 ...row,
                 operation: globaldata.User.role === 1 ? `
     <button class="update-btn btn btn-outline-primary btn-floating btn-sm" data-mdb-id="${row.id}"><i class="fas fa-edit"></i></button>
-    <button class="delete-btn btn ms-2 btn-danger btn-floating btn-sm" data-mdb-id="${row.id}"><i class="fa fa-trash"></i></button>`: "",
+    <button class="delete-btn btn ms-2 btn-danger btn-floating btn-sm" data-mdb-id="${row.id}"><i class="fa fa-trash"></i></button>` : "",
             };
         }),
     };
@@ -300,8 +313,8 @@ function CalcUserData() {
         rows: [...globaldata.UserList].map((row) => {
             return {
                 ...row,
-                operation:globaldata.User.role === 1 ? `
-    <button class="update-btn btn btn-outline-primary btn-floating btn-sm" data-mdb-id="${row.id}"><i class="fas fa-edit"></i></button>`: "",
+                operation: globaldata.User.role === 1 ? `
+    <button class="update-btn btn btn-outline-primary btn-floating btn-sm" data-mdb-id="${row.id}"><i class="fas fa-edit"></i></button>` : "",
             };
         }),
     };
@@ -535,7 +548,7 @@ function deleteImage(dom) {
             if (res.data.code === 200) {
                 alert("删除成功");
                 await getAllImage();
-                loadPage(ImageManagePage(globaldata.ImageList,globaldata.User.role));
+                loadPage(ImageManagePage(globaldata.ImageList, globaldata.User.role));
             } else {
                 alert("删除失败");
             }
