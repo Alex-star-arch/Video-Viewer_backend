@@ -1,7 +1,7 @@
 import base64
 import os
 from datetime import datetime
-
+import re
 import pymysql
 
 
@@ -41,30 +41,39 @@ class Database:
         connection = _connect()
         self.cursor = connection.cursor()
         try:
-            folder_path = 'static/images/picture'  # 文件夹路径
+            folder_path = 'app/static/images/picture'  # 文件夹路径
             for filename in os.listdir(folder_path):
                 if filename.endswith('.jpg') or filename.endswith('.png'):
-                    # 分割文件名
-                    name_parts = filename.split('.')
-                    # 获取test1部分的数字
-                    streamnum = ''.join(filter(str.isdigit, name_parts[0]))
+                    # 提取图像文件名
+                    index = filename.find(".mp4")
+                    if index != -1:
+                        filenamep = filename[:index]
+                    print("filename:" + filenamep)
+
+                    indexweed = filename.rfind("+")
+                    indexweedtail = filename.find(".jpg")
+                    if indexweed != -1 and indexweedtail != -1:
+                        strweed = filename[indexweed + 1:indexweedtail]
+                    print("strweed:" + strweed)
+                    match = re.search(r'\+(.*?)\+', filename)
+                    if match:
+                        streamnum = match.group(1)
                     date = datetime.now()
-                    sql2 = "insert into picture(id,streamnum, date, image) values(0,%s,%s,%s)"
+                    sql2 = "insert into picture(id,streamnum, date, image, weeds) values(0,%s,%s,%s,%s)"
                     with open(os.path.join(folder_path, filename), 'rb') as f:
                         image_data = f.read()
                     image_base64 = base64.b64encode(image_data).decode('utf-8')
                     image = f'data:image/jpeg;base64,{image_base64}'
-                    imagee = (streamnum, date, image)
-                    self.cursor.execute(sql2, imagee)
+                    imageTuple = (streamnum, date, image, strweed)
+                    self.cursor.execute(sql2, imageTuple)
                     connection.commit()
                     os.remove(os.path.join(folder_path, filename))
-        except Exception as e:
-            print("addImage Error:", e)
         finally:
             connection.close()
 
     def getImage(self, VideoId):
         # 获取VideoId对应的所有图像
+        self.cursor = None
         connection = _connect()
         self.cursor = connection.cursor()
         try:
@@ -141,6 +150,7 @@ class Database:
 
     def getStreamUrl(self):
         # 获取流地址
+        self.cursor = None
         connection = _connect()
         self.cursor = connection.cursor()
         try:
@@ -200,6 +210,7 @@ class Database:
 
     def getAllStream(self):
         # 获取所有流
+        self.cursor = None
         connection = _connect()
         self.cursor = connection.cursor()
         try:
@@ -222,6 +233,7 @@ class Database:
 
     def getAllUser(self):
         # 获取所有用户
+        self.cursor = None
         connection = _connect()
         self.cursor = connection.cursor()
         try:
@@ -242,6 +254,7 @@ class Database:
 
     def getUser(self, current_user):
         # 获取当前用户
+        self.cursor = None
         connection = _connect()
         self.cursor = connection.cursor()
         try:
@@ -339,6 +352,7 @@ class Database:
 
     def getUserRole(self, username):
         # 获取用户角色
+        self.cursor = None
         connection = _connect()
         self.cursor = connection.cursor()
         try:
@@ -372,6 +386,7 @@ class Database:
 
     def getAllImage(self):
         # 获取所有图片
+        self.cursor = None
         connection = _connect()
         self.cursor = connection.cursor()
         try:
@@ -411,6 +426,7 @@ class Database:
             connection.close()
 
     def getAlert(self):
+        self.cursor = None
         connection = _connect()
         self.cursor = connection.cursor()
         try:

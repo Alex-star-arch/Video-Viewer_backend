@@ -77,8 +77,6 @@ init();
 Router = async function (Data) {
     let Link = Data.getAttribute("data-route");
     let VideoId = Data.getAttribute("data-video");
-    // console.log(Link, VideoId);
-    // console.log(Data);
     switch (Link) {
         case "VideoFlow":
             collapseHide();
@@ -86,8 +84,9 @@ Router = async function (Data) {
             VideoFlowInit();
             break;
         case "VideoAnysis":
+            const VideoRealId=globaldata.StreamList.find((item)=>item.stream===globaldata.VideoList[VideoId]).id;
             if (!VideoId) await getVideoImage(0);
-            else await getVideoImage(VideoId);
+            else await getVideoImage(VideoRealId);
             globaldata.VideoAnalyseList.VideoUrl = globaldata.VideoList[VideoId];
             loadPage(VideoAnalysePage(globaldata.VideoAnalyseList, VideoId));
             VideoAnalyseInit();
@@ -355,7 +354,7 @@ async function getVideoList() {
 
 async function getVideoImage(id) {
     // 从后端获取视频分析图像（axios)
-    id = parseInt(id) + 1;
+    id = parseInt(id);
     await axios.get("/videoimage?videoid=" + id).then((res) => {
         if (res.data.code === 200) {
             globaldata.VideoAnalyseList.VideoAnalyseImage = [...res.data.data];
