@@ -129,9 +129,13 @@ function VideoFlowInit() {
             console.log(`RTSP ${video.dataset.src}`);
             if (flvjs.isSupported()) {
                 const flvPlayer = flvjs.createPlayer({
-                    type: 'flv',
-                    url: video.dataset.src,
-                });
+                type: 'flv',
+                url: video.dataset.src,
+                isLive: true,
+            }, {
+                enableStashBuffer: false,
+                reuseRedirectedURL: true,
+            });
                 flvPlayer.attachMediaElement(video);
                 flvPlayer.load();
                 flvPlayer.play();
@@ -149,6 +153,10 @@ function VideoAnalyseInit() {
             const flvPlayer = flvjs.createPlayer({
                 type: 'flv',
                 url: video.dataset.src,
+                isLive: true,
+            }, {
+                enableStashBuffer: false,
+                reuseRedirectedURL: true,
             });
             flvPlayer.attachMediaElement(video);
             flvPlayer.load();
