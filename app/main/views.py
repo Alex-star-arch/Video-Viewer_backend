@@ -4,7 +4,6 @@ from flask import render_template, request, jsonify
 from imageprocess import *
 from . import main
 
-
 # 根目录跳转
 from ..utils import parse_jwt
 
@@ -13,9 +12,11 @@ from ..utils import parse_jwt
 def root():
     return render_template('auth/login.html')
 
+
 @main.route('/usercreate', methods=['GET'])
 def usercreate():
     return render_template('auth/register.html')
+
 
 # 首页
 @main.route('/index', methods=['GET'])
@@ -114,6 +115,7 @@ def userlistquery():
             result = database.getAllUser()
             return {'code': 200, 'msg': '查询成功', 'data': result}
 
+
 @main.route('/userlistupdate', methods=['POST'])
 def userlistupdate():
     # 检验JWT
@@ -129,12 +131,12 @@ def userlistupdate():
         else:
             updateid = json.loads(request.get_data().decode('utf-8'))['userid']
             updaterole = json.loads(request.get_data().decode('utf-8'))['role']
-            print(updateid, updaterole)
             result = database.updateUserRole(updateid, updaterole)
             if result == 'Fail':
                 return {'code': 400, 'msg': '修改失败'}
             else:
                 return {'code': 200, 'msg': '修改成功'}
+
 
 @main.route('/imagelistquery', methods=['GET'])
 def imagelistquery():
@@ -144,15 +146,16 @@ def imagelistquery():
     else:
         return {'code': 200, 'msg': '查询成功', 'data': result}
 
+
 @main.route('/imagelistdelete', methods=['POST'])
 def imagelistdelete():
     image_id = json.loads(request.get_data().decode('utf-8'))['imageid']
-    print(image_id)
     result = database.deleteImage(image_id)
     if result == 'Fail':
         return {'code': 400, 'msg': '删除失败'}
     else:
         return {'code': 200, 'msg': '删除成功'}
+
 
 # 用户界面
 @main.route('/userrole', methods=['POST'])
@@ -167,3 +170,21 @@ def userrole():
         result = database.getUserRole(useranme)
         return {'code': 200, 'msg': '查询成功', 'data': result}
 
+
+@main.route('/alertquery', methods=['GET'])
+def alertquert():
+    result = database.getAlert()
+    if (result == 'Fail'):
+        return {'code': 400, 'msg': '获取报警信息失败'}
+    else:
+        return {'code': 200, 'msg': '获取报警信息成功', 'data': result}
+
+
+@main.route('/alertdelete', methods=['POST'])
+def alertdelete():
+    stream_id = json.loads(request.get_data().decode('utf-8'))['streamid']
+    result = database.deleteAlert(stream_id)
+    if (result == 'Fail'):
+        return {'code': 400, 'msg': '获取报警信息失败'}
+    else:
+        return {'code': 200, 'msg': '获取报警信息成功', 'data': result}

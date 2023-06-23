@@ -30,6 +30,8 @@ class Database:
                 """ % TableName
             self.cursor.execute(sql)
             connection.commit()
+        except Exception as e:
+            print("createPictureTable Error:", e)
         finally:
             connection.close()
 
@@ -55,6 +57,8 @@ class Database:
                     self.cursor.execute(sql2, imagee)
                     connection.commit()
                     os.remove(os.path.join(folder_path, filename))
+        except Exception as e:
+            print("addImage Error:", e)
         finally:
             connection.close()
 
@@ -73,8 +77,8 @@ class Database:
                 decoded_image = decoded_image.replace('dataimage/jpegbase64', '')
                 decoded_images.append(decoded_image)
             return decoded_images
-        except:
-            print("getImageError")
+        except Exception as e:
+            print("getImage Error:", e)
             return []
         finally:
             connection.close()
@@ -94,6 +98,9 @@ class Database:
                 )CHARACTER SET utf8 COLLATE utf8_general_ci
                 """ % TableName
             self.cursor.execute(sql)
+            connection.commit()
+        except Exception as e:
+            print("createStreamTable Error:", e)
         finally:
             connection.close()
 
@@ -116,7 +123,8 @@ class Database:
                 self.cursor.execute(sql, stm)
                 connection.commit()
                 return 'Success'
-            except:
+            except Exception as e:
+                print("addStream Error:", e)
                 return 'Fail'
         finally:
             connection.close()
@@ -135,7 +143,8 @@ class Database:
                 stream = ''.join(stream)
                 streamlist.append(stream)
             return streamlist
-        except:
+        except Exception as e:
+            print("getStreamUrl Error:", e)
             return []
         finally:
             connection.close()
@@ -156,6 +165,9 @@ class Database:
                 return 'Success'
             else:
                 return 'Fail'
+        except Exception as e:
+            print("deleteStream Error:", e)
+            return 'Fail'
         finally:
             connection.close()
 
@@ -170,7 +182,8 @@ class Database:
                 self.cursor.execute(sql, values)
                 connection.commit()
                 return 'Success'
-            except:
+            except Exception as e:
+                print("updateStream Error:", e)
                 return 'Fail'
         finally:
             connection.close()
@@ -191,8 +204,9 @@ class Database:
                 # 将每个列和相应的值添加到字典中
                 data.append(temp_dict)
             return data
-        except:
-            return [];
+        except Exception as e:
+            print("getAllStream Error:", e)
+            return []
         finally:
             connection.close()
 
@@ -210,8 +224,9 @@ class Database:
                 # 将每个列和相应的值添加到字典中
                 data.append(temp_dict)
             return data
-        except:
-            return [];
+        except Exception as e:
+            print("getAllUser Error:", e)
+            return []
         finally:
             connection.close()
 
@@ -229,6 +244,9 @@ class Database:
             # 将每个列和相应的值添加到字典中
             data.append(temp_dict)
             return data
+        except Exception as e:
+            print("getUser Error:", e)
+            return []
         finally:
             connection.close()
 
@@ -243,7 +261,8 @@ class Database:
                 self.cursor.execute(sql, values)
                 connection.commit()
                 return 'Success'
-            except:
+            except Exception as e:
+                print("updateUser Error:", e)
                 return 'Fail'
         finally:
             connection.close()
@@ -265,6 +284,9 @@ class Database:
                     return 'user'
             else:
                 return 'Fail'
+        except Exception as e:
+            print("checkUser Error:", e)
+            return 'Fail'
         finally:
             connection.close()
 
@@ -281,6 +303,9 @@ class Database:
                 return 'Success'
             else:
                 return 'Fail'
+        except Exception as e:
+            print("isUserExist Error:", e)
+            return 'Fail'
         finally:
             connection.close()
 
@@ -296,7 +321,8 @@ class Database:
                 self.cursor.execute(sql, stm)
                 connection.commit()
                 return 'Success'
-            except:
+            except Exception as e:
+                print("registerUser Error:", e)
                 return 'Fail'
         finally:
             connection.close()
@@ -311,7 +337,8 @@ class Database:
             self.cursor.execute(sql, values)
             result = self.cursor.fetchone()
             return result
-        except:
+        except Exception as e:
+            print("getUserRole Error:", e)
             return 0
         finally:
             connection.close()
@@ -327,7 +354,8 @@ class Database:
                 self.cursor.execute(sql, values)
                 connection.commit()
                 return 'Success'
-            except:
+            except Exception as e:
+                print("updateUserRole Error:", e)
                 return 'Fail'
         finally:
             connection.close()
@@ -349,24 +377,71 @@ class Database:
                 # 将每个列和相应的值添加到字典中
                 data.append(temp_dict)
             return data
+        except Exception as e:
+            print("getAllImage Error:", e)
+            return []
         finally:
             connection.close()
 
-    def deleteImage(self, id):
+    def deleteImage(self, imageId):
         # 删除图片
         connection = _connect()
         self.cursor = connection.cursor()
         try:
             try:
                 sql = """delete from picture where id = %s"""
-                values = id
+                values = imageId
                 self.cursor.execute(sql, values)
                 connection.commit()
                 return 'Success'
-            except:
+            except Exception as e:
+                print("deleteImage Error:", e)
                 return 'Fail'
         finally:
             connection.close()
+
+    def getAlert(self):
+        connection = _connect()
+        self.cursor = connection.cursor()
+        try:
+            try:
+                sql = """SELECT streamnum,date,weeds FROM picture"""
+                self.cursor.execute(sql)
+                alert = self.cursor.fetchall()
+                alert = [tuple(data) for data in alert]
+                modified_list = []
+                for tuple_data in alert:
+                    if tuple_data[2] is None:
+                        continue
+                    modified_date = tuple_data[1].strftime("%Y-%m-%d %H:%M:%S")
+                    modified_element = tuple_data[2].replace('weeds,', '处草').replace('vines,', '处藤蔓')
+                    modified_tuple = tuple_data[:1] + (modified_date,) + (modified_element,) + tuple_data[3:]
+                    temp_dict = {"streamid": modified_tuple[0], "datetime": modified_tuple[1],
+                                 "warncontent": modified_tuple[2]}
+                    modified_list.append(temp_dict)
+                return modified_list
+            except Exception as e:
+                print("getAlert Error:", e)
+                return 'Fail'
+        finally:
+            connection.close()
+
+    def deleteAlert(self, streamnum):
+        connection = _connect()
+        self.cursor = connection.cursor()
+        try:
+            try:
+                sql = """delete from picture where streamnum = %s"""
+                values = streamnum
+                self.cursor.execute(sql, values)
+                connection.commit()
+                return 'Success'
+            except Exception as e:
+                print("deleteAlert Error:", e)
+                return 'Fail'
+        finally:
+            connection.close()
+
 
 def read_image(filepath):
     with open(filepath, 'rb') as f:

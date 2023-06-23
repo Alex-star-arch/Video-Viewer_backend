@@ -5,12 +5,15 @@ const globaldata = {
         VideoAnysisImage: [],
     },
     StreamList: [],
+    UserList: [],
+    ImageList: [],
+    Token: localStorage.getItem('token'),
     User: {
         username: "",
         id: "",
         role: "",
     },
-    UserList: [],
+    WarnList: [],
     UserColumn: [
         {label: "ID", field: "id"},
         {label: "用户名", field: "username"},
@@ -25,21 +28,20 @@ const globaldata = {
         {label: "操作", field: "operation", sort: false},
     ],
     WarningColumn: [
-        {label: "警告ID", field: "id"},
+        {label: "警告ID", field: "streamid"},
         {label: "警告时间", field: "datetime"},
-        {label: "警告内容", field: "content"},
+        {label: "警告内容", field: "warncontent"},
     ],
-    ImageList: [],
-    Token: localStorage.getItem('token')
 };
 
-let videotable = null;
-let usertable = null;
+let videoTable = null;
+let userTable = null;
+let warnTable = null;
 
-const addmodal = new mdb.Modal(document.getElementById("addmodal"));
-const updatemodal = new mdb.Modal(document.getElementById("updatemodal"));
-const timemodal = new mdb.Modal(document.getElementById("timemodal"));
-const usermodal = new mdb.Modal(document.getElementById("usermodal"));
+const addModal = new mdb.Modal(document.getElementById("addmodal"));
+const updateModal = new mdb.Modal(document.getElementById("updatemodal"));
+const timeModal = new mdb.Modal(document.getElementById("timemodal"));
+const userModal = new mdb.Modal(document.getElementById("usermodal"));
 const pickerInline = document.querySelector(".timepicker-inline-24");
 const timepickerMaxMin = new mdb.Timepicker(pickerInline, {
     format24: true,
@@ -59,10 +61,10 @@ function init() {
     getStreamList();
     getUser();
     getUserList();
+    getAllWarn();
     setTimeout(() => {
-    getAllImage();
-    },2000)
-    //getAllImage();
+        getAllImage();
+    }, 2000)
     sidenavInstance.show();
 }
 
@@ -88,13 +90,13 @@ Router = async function (Data) {
             collapseHide();
             //await getStreamList()
             loadPage(VideoManagePage());
-            videotable = VideoManageInit();
+            videoTable = VideoManageInit();
             break;
         case "UserManage":
             collapseHide();
             //await getUserList();
             loadPage(UserManagePage());
-            usertable = UserManageInit();
+            userTable = UserManageInit();
             if (globaldata.User.role !== 1) {
                 alert("您没有权限进行此操作！")
             }
@@ -105,6 +107,10 @@ Router = async function (Data) {
             break;
         case "ImageManage":
             loadPage(ImageManagePage(globaldata.ImageList));
+            break;
+        case "WarnManage":
+            loadPage(WarnManagePage());
+            warnTable = WarnManageInit();
             break;
         default:
             break;
@@ -129,7 +135,7 @@ function VideoManageInit() {
                     globaldata.StreamList.find((item) => item.id === id).streamname;
                 document.getElementById("upstreamurl").value =
                     globaldata.StreamList.find((item) => item.id === id).stream;
-                updatemodal.show();
+                updateModal.show();
             });
         });
         // 视频流删除按钮
@@ -145,7 +151,7 @@ function VideoManageInit() {
     document.querySelector("#add-btn").addEventListener("click", () => {
         console.log("add");
         document.getElementById("streamid").value = "无需填写";
-        addmodal.show();
+        addModal.show();
     });
 
     streamDatatable.addEventListener("render.mdb.datatable", setActions);
@@ -178,7 +184,7 @@ function VideoManageInit() {
 
 // 计算视频流数据
 function CalcVideoData() {
-    return VideoData = {
+    return {
         columns: [...globaldata.StreamColumn],
         rows: [...globaldata.StreamList].map((row) => {
             return {
@@ -209,7 +215,7 @@ function UserManageInit() {
                 document.getElementById("upuserid").value = user.id;
                 document.getElementById("upusername").value = user.username;
                 document.getElementById("upuserrole").value = user.role;
-                usermodal.show();
+                userModal.show();
             });
         });
     };
@@ -245,13 +251,55 @@ function UserManageInit() {
 
 // 计算用户数据
 function CalcUserData() {
-    return UserData = {
+    return {
         columns: [...globaldata.UserColumn],
         rows: [...globaldata.UserList].map((row) => {
             return {
                 ...row,
                 operation: `
     <button class="update-btn btn btn-outline-primary btn-floating btn-sm" data-mdb-id="${row.id}"><i class="fas fa-edit"></i></button>`,
+            };
+        }),
+    };
+}
+
+//初始化警告表格
+function WarnManageInit() {
+    const options = {
+        striped: true,
+        selectable: false,
+        loaderClass: "bg-info",
+        borderColor: "light",
+        bordered: true,
+        multi: true,
+        entriesOptions: [5, 10, 15],
+        fixedHeader: true,
+    };
+    const basicData = CalcWarnData();
+    const TableInstance = new mdb.Datatable(
+        document.getElementById("warntable"),
+        basicData,
+        options
+    );
+    // 搜索框
+    document
+        .getElementById("datatable-search-input")
+        .addEventListener("input", (e) => {
+            TableInstance.search(e.target.value);
+        });
+    TableInstance.update(basicData);
+    return TableInstance;
+}
+
+// 计算警告数据
+function CalcWarnData() {
+    return {
+        columns: [...globaldata.WarningColumn],
+        rows: [...globaldata.WarnList].map((row) => {
+            return {
+                ...row,
+                operation: `
+    <button class="delete-btn btn ms-2 btn-danger btn-floating btn-sm" data-mdb-id="${row.id}"><i class="fa fa-trash"></i></button>`,
             };
         }),
     };
@@ -288,7 +336,7 @@ async function getStreamList() {
             getVideoList()
             // globaldata.StreamList.forEach((item) => {
             // });
-            if (videotable !== null) videotable.update(CalcVideoData());
+            if (videoTable !== null) videoTable.update(CalcVideoData());
         } else {
             console.log(res.data.msg);
         }
@@ -307,7 +355,7 @@ function updateStream() {
             console.log(res);
             if (res.data.code === 200) {
                 alert("修改成功");
-                updatemodal.hide();
+                updateModal.hide();
                 getStreamList();
             } else {
                 alert("修改失败");
@@ -326,7 +374,7 @@ function addStream() {
             console.log(res);
             if (res.data.code === 200) {
                 alert("添加成功");
-                addmodal.hide();
+                addModal.hide();
                 getStreamList();
             } else {
                 alert("添加失败");
@@ -361,7 +409,7 @@ async function getUserList() {
                 if (item.role === 1) item.role = "管理员";
                 else item.role = "用户";
             });
-            if (usertable !== null) usertable.update(CalcUserData());
+            if (userTable !== null) userTable.update(CalcUserData());
         } else {
             console.log(res.data.msg);
         }
@@ -380,7 +428,7 @@ function updateUser() {
             console.log(res);
             if (res.data.code === 200) {
                 alert("修改成功");
-                usermodal.hide();
+                userModal.hide();
                 getUserList();
             } else {
                 alert("修改失败");
@@ -411,7 +459,6 @@ function addClock() {
     form.append("hour", hour);
     form.append("minute", minute);
     axios.post("/addClock", form).then((res) => {
-        console.log(res);
         if (res.data.msg === "success") {
             alert("设置成功");
         }
@@ -449,14 +496,22 @@ function deleteImage(dom) {
         });
 }
 
+async function getAllWarn() {
+    // 获取所有报警信息（axios)
+    await axios.get("/alertquery").then((res) => {
+        if (res.data.code === 200) {
+            globaldata.WarnList = res.data.data;
+            if(warnTable)warnTable.update(CalcWarnData());
+        } else {
+            console.log(res.data.msg);
+        }
+    });
+}
+
 function tologin() {
     window.location.href = "http://127.0.0.1:8080";
 }
-// function collapseShow(){
-//     collapseList.forEach(item=>{
-//         item.show();
-//     })
-// }
+
 function collapseHide() {
     collapseList.forEach(item => {
         item.hide();

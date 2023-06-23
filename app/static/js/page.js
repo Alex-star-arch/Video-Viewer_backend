@@ -161,7 +161,7 @@ function ImageManagePage(ImageList) {
     return page;
 }
 
-function WarningManagePage() {
+function WarnManagePage() {
     let page = `
     <div class="row m-0 vh-100">
     <div class="card ">
@@ -183,7 +183,7 @@ function WarningManagePage() {
             <i class="fas fa-plus"></i>
           </button>
         </div>
-        <div id="waringtable" data-mdb-stripped="true" data-mdb-max-height="80vh" data-mdb-max-width="100vw"></div>
+        <div id="warntable" data-mdb-stripped="true" data-mdb-max-height="80vh" data-mdb-max-width="100vw"></div>
       </div>
     </div>
   </div>
