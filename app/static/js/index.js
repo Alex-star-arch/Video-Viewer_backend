@@ -125,11 +125,12 @@ function loadPage(page) {
 
 function VideoFlowInit() {
     for (let i = 0; i < globaldata.VideoList.length; i++) {
+        let offLineCount = 0;
         let video = document.getElementById(`Video-preview-${i}`);
         if (video.dataset.protocol === 'RTSP') {
             console.log(`RTSP ${video.dataset.src}`);
             if (flvjs.isSupported()) {
-                const flvPlayer = flvjs.createPlayer({
+                let flvPlayer = flvjs.createPlayer({
                     type: 'flv',
                     url: video.dataset.src,
                     isLive: true,
@@ -140,11 +141,16 @@ function VideoFlowInit() {
                 flvPlayer.attachMediaElement(video);
                 flvPlayer.load();
                 flvPlayer.play();
-                flvPlayer.on(flvjs.Events.ERROR, (errorType, errorDetail, errorInfo) => {
-                    console.log("视频错误信息回调")
-                    console.log("errorType:", errorType);
-                    console.log("errorDetail:", errorDetail);
-                    console.log("errorInfo:", errorInfo);
+                flvPlayer.on(flvjs.Events.STATISTICS_INFO, (res) => {
+                    if(res.speed===0)offLineCount++;
+                    if(offLineCount>20){
+                    console.log(i,"号视频流已断开");
+                    flvPlayer.pause();
+                    flvPlayer.unload();
+                    flvPlayer.detachMediaElement();
+                    flvPlayer.destroy();
+                    flvPlayer=null;
+                }
                 });
             }
         }
@@ -154,10 +160,11 @@ function VideoFlowInit() {
 
 function VideoAnalyseInit() {
     const video = document.getElementById("Video-analyse");
+    let offLineCount = 0;
     if (video.dataset.protocol === 'RTSP') {
         console.log(`RTSP ${video.dataset.src}`);
         if (flvjs.isSupported()) {
-            const flvPlayer = flvjs.createPlayer({
+            let flvPlayer = flvjs.createPlayer({
                 type: 'flv',
                 url: video.dataset.src,
                 isLive: true,
@@ -168,12 +175,17 @@ function VideoAnalyseInit() {
             flvPlayer.attachMediaElement(video);
             flvPlayer.load();
             flvPlayer.play();
-              flvPlayer.on(flvjs.Events.ERROR, (errorType, errorDetail, errorInfo) => {
-                  console.log("视频错误信息回调")
-                  console.log("errorType:", errorType);
-                  console.log("errorDetail:", errorDetail);
-                  console.log("errorInfo:", errorInfo);
-                })
+            flvPlayer.on(flvjs.Events.STATISTICS_INFO, (res) => {
+                    if(res.speed===0)offLineCount++;
+                    if(offLineCount>20){
+                    console.log("视频流已断开");
+                    flvPlayer.pause();
+                    flvPlayer.unload();
+                    flvPlayer.detachMediaElement();
+                    flvPlayer.destroy();
+                    flvPlayer=null;
+                }
+                });
         }
     }
 }
