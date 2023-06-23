@@ -1,8 +1,8 @@
 const globaldata = {
     VideoUrlList: [],
-    VideoAnysisList: {
+    VideoAnalyseList: {
         VideoUrl: "",
-        VideoAnysisImage: [],
+        VideoAnalyseImage: [],
     },
     StreamList: [],
     UserList: [],
@@ -28,7 +28,8 @@ const globaldata = {
         {label: "操作", field: "operation", sort: false},
     ],
     WarningColumn: [
-        {label: "警告ID", field: "streamid"},
+        {label: "警告视频流ID", field: "streamid"},
+        {label: "警告视频流名称", field: "streamname"},
         {label: "警告时间", field: "datetime"},
         {label: "警告内容", field: "warncontent"},
     ],
@@ -84,8 +85,8 @@ Router = async function (Data) {
         case "VideoAnysis":
             if (!VideoId) await getVideoImage(0);
             else await getVideoImage(VideoId);
-            globaldata.VideoAnysisList.VideoUrl = globaldata.VideoList[VideoId];
-            loadPage(VideoAnalysePage(globaldata.VideoAnysisList, VideoId));
+            globaldata.VideoAnalyseList.VideoUrl = globaldata.VideoList[VideoId];
+            loadPage(VideoAnalysePage(globaldata.VideoAnalyseList, VideoId));
             VideoAnalyseInit();
             break;
         case "VideoManage":
@@ -358,7 +359,7 @@ async function getVideoImage(id) {
     id = parseInt(id) + 1;
     await axios.get("/videoimage?videoid=" + id).then((res) => {
         if (res.data.code === 200) {
-            globaldata.VideoAnysisList.VideoAnysisImage = [...res.data.data];
+            globaldata.VideoAnalyseList.VideoAnalyseImage = [...res.data.data];
         } else {
             console.log(res.data.msg);
         }
@@ -371,8 +372,6 @@ async function getStreamList() {
         if (res.data.code === 200) {
             globaldata.StreamList = res.data.data;
             getVideoList()
-            // globaldata.StreamList.forEach((item) => {
-            // });
             if (videoTable !== null) videoTable.update(CalcVideoData());
         } else {
             console.log(res.data.msg);

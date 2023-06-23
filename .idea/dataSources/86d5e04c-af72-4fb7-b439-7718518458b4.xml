@@ -1024,7 +1024,7 @@ sys|schema||mysql.sys|localhost|TRIGGER|G</Grants>
       <Position>1</Position>
     </column>
     <column id="291" parent="287" name="streamnum">
-      <DataType>varchar(255)|0s</DataType>
+      <DataType>int|0s</DataType>
       <NotNull>1</NotNull>
       <Position>2</Position>
     </column>

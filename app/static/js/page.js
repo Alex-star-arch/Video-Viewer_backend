@@ -8,7 +8,7 @@ function VideoFlowPage(VideoUrlList) {
         const src=isRTSP?`ws://localhost:8888/rtsp/${i}/?url=`+VideoUrlList[i]:VideoUrlList[i];
         let InnerContent = `
       <div  class="col-4 p-0" onclick="Router(this)" data-route="VideoAnysis" data-video="${i}">
-        <video autoplay muted style="width:100%;height: 100%;" id="Video-preview-${i}" data-protocol="${isRTSP?"RTSP":"HTTP"}" data-src="${src}">
+        <video autoplay muted loop style="width:100%;height: 100%;" id="Video-preview-${i}" data-protocol="${isRTSP?"RTSP":"HTTP"}" data-src="${src}">
           <source src="${VideoUrlList[i]}" type="video/mp4">
           <source src="../static/video/defult.mp4" type="video/mp4">
           </video>
@@ -40,10 +40,10 @@ function VideoAnalysePage(VideoAnalyseList,VideoIndex) {
       <div class="col-3 p-0" id="ImageList">
         <ul class="list-group list-group-light" id="ImageList">
     `;
-    for (let VideoAnysisImage of VideoAnalyseList.VideoAnysisImage) {
+    for (let VideoAnalyseImage of VideoAnalyseList.VideoAnalyseImage) {
         page += `
       <li class="list-group-item black-list">
-        <img src="data:image/jpeg;base64,${VideoAnysisImage}" class="img-fluid" alt="Wild Landscape"/>
+        <img src="data:image/jpeg;base64,${VideoAnalyseImage}" class="img-fluid" alt="Wild Landscape"/>
       </li>
       `;
     }

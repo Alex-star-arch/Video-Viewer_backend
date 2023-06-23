@@ -1,7 +1,7 @@
 import json
 import requests
-from flask import render_template, request, jsonify
-from imageprocess import *
+from flask import render_template, request
+from app.dao import *
 from . import main
 
 # 根目录跳转
@@ -47,7 +47,7 @@ def videolistadd():
     stream = json.loads(request.get_data().decode('utf-8'))['stream']
     result = database.addStream(streamname, stream)
     if result == 'Fail':
-        return {'code': 400, 'msg': '添加失败'}
+        return {'code': 500, 'msg': '添加失败'}
     else:
         return {'code': 200, 'msg': '添加成功'}
 
@@ -58,7 +58,7 @@ def videolistdelete():
     video_id = json.loads(request.get_data().decode('utf-8'))['videoid']
     result = database.deleteStream(video_id)
     if result == 'Fail':
-        return {'code': 400, 'msg': '删除失败'}
+        return {'code': 500, 'msg': '删除失败'}
     else:
         return {'code': 200, 'msg': '删除成功'}
 
@@ -71,7 +71,9 @@ def videolistupdate():
     updatestream = json.loads(request.get_data().decode('utf-8'))['stream']
     result = database.updateStream(updateid, updatestreamname, updatestream)
     if result == 'Fail':
-        return {'code': 400, 'msg': '修改失败'}
+        return {'code': 500, 'msg': '修改失败'}
+    elif result == 'Exist':
+        return {'code': 500, 'msg': '已存在该视频流'}
     else:
         return {'code': 200, 'msg': '修改成功'}
 
@@ -106,11 +108,11 @@ def userlistquery():
     token = request.headers.get('Authorization').split(' ')[1]
     payload = parse_jwt(token)
     if payload is None:
-        return {'code': 400, 'msg': '请先登录'}
+        return {'code': 500, 'msg': '请先登录'}
     else:
         role = payload['role']
         if role != 'admin':
-            return {'code': 400, 'msg': '您没有权限'}
+            return {'code': 500, 'msg': '您没有权限'}
         else:
             result = database.getAllUser()
             return {'code': 200, 'msg': '查询成功', 'data': result}
@@ -123,17 +125,17 @@ def userlistupdate():
     token = request.headers.get('Authorization').split(' ')[1]
     payload = parse_jwt(token)
     if payload is None:
-        return {'code': 400, 'msg': '请先登录'}
+        return {'code': 500, 'msg': '请先登录'}
     else:
         role = payload['role']
         if role != 'admin':
-            return {'code': 400, 'msg': '您没有权限'}
+            return {'code': 500, 'msg': '您没有权限'}
         else:
             updateid = json.loads(request.get_data().decode('utf-8'))['userid']
             updaterole = json.loads(request.get_data().decode('utf-8'))['role']
             result = database.updateUserRole(updateid, updaterole)
             if result == 'Fail':
-                return {'code': 400, 'msg': '修改失败'}
+                return {'code': 500, 'msg': '修改失败'}
             else:
                 return {'code': 200, 'msg': '修改成功'}
 
@@ -142,7 +144,7 @@ def userlistupdate():
 def imagelistquery():
     result = database.getAllImage()
     if result == 'Fail':
-        return {'code': 400, 'msg': '查询失败'}
+        return {'code': 500, 'msg': '查询失败'}
     else:
         return {'code': 200, 'msg': '查询成功', 'data': result}
 
@@ -152,7 +154,7 @@ def imagelistdelete():
     image_id = json.loads(request.get_data().decode('utf-8'))['imageid']
     result = database.deleteImage(image_id)
     if result == 'Fail':
-        return {'code': 400, 'msg': '删除失败'}
+        return {'code': 500, 'msg': '删除失败'}
     else:
         return {'code': 200, 'msg': '删除成功'}
 
@@ -164,7 +166,7 @@ def userrole():
     token = request.headers.get('Authorization').split(' ')[1]
     payload = parse_jwt(token)
     if payload is None:
-        return {'code': 400, 'msg': '请先登录'}
+        return {'code': 500, 'msg': '请先登录'}
     else:
         useranme = payload['username']
         result = database.getUserRole(useranme)
@@ -175,7 +177,7 @@ def userrole():
 def alertquert():
     result = database.getAlert()
     if (result == 'Fail'):
-        return {'code': 400, 'msg': '获取报警信息失败'}
+        return {'code': 500, 'msg': '获取报警信息失败'}
     else:
         return {'code': 200, 'msg': '获取报警信息成功', 'data': result}
 
@@ -185,6 +187,6 @@ def alertdelete():
     stream_id = json.loads(request.get_data().decode('utf-8'))['streamid']
     result = database.deleteAlert(stream_id)
     if (result == 'Fail'):
-        return {'code': 400, 'msg': '获取报警信息失败'}
+        return {'code': 500, 'msg': '获取报警信息失败'}
     else:
         return {'code': 200, 'msg': '获取报警信息成功', 'data': result}

@@ -1,9 +1,10 @@
 import json
 
 from flask import request, render_template
-from imageprocess import database
+from app.dao import database
 from . import auth
-from app.utils import gen_jwt,parse_jwt
+from app.utils import gen_jwt
+
 
 @auth.route('/', methods=['GET'])
 def root():
