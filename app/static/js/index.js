@@ -65,8 +65,10 @@ async function init() {
     await getAllWarn();
     setTimeout(() => {
         getAllImage();
-    }, 2000)
-    sidenavInstance.show();
+    }, 2000);
+    setTimeout(() => {
+        sidenavInstance.toggle();
+    }, 500);
     Router(document.getElementById("VideoFlow"));
 }
 
