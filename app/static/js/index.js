@@ -94,20 +94,20 @@ Router = async function (Data) {
         case "VideoManage":
             collapseHide();
             //await getStreamList()
-            loadPage(VideoManagePage());
+            loadPage(VideoManagePage(globaldata.User.role));
             videoTable = VideoManageInit();
             break;
         case "UserManage":
             collapseHide();
             //await getUserList();
-            loadPage(UserManagePage());
+            loadPage(UserManagePage(globaldata.User.role));
             userTable = UserManageInit();
             if (globaldata.User.role !== 1) {
                 alert("您没有权限进行此操作！")
             }
             break;
         case "ImageManage":
-            loadPage(ImageManagePage(globaldata.ImageList));
+            loadPage(ImageManagePage(globaldata.ImageList,globaldata.User.role));
             break;
         case "WarnManage":
             loadPage(WarnManagePage());
@@ -225,9 +225,9 @@ function CalcVideoData() {
         rows: [...globaldata.StreamList].map((row) => {
             return {
                 ...row,
-                operation: `
+                operation: globaldata.User.role === 1 ? `
     <button class="update-btn btn btn-outline-primary btn-floating btn-sm" data-mdb-id="${row.id}"><i class="fas fa-edit"></i></button>
-    <button class="delete-btn btn ms-2 btn-danger btn-floating btn-sm" data-mdb-id="${row.id}"><i class="fa fa-trash"></i></button>`,
+    <button class="delete-btn btn ms-2 btn-danger btn-floating btn-sm" data-mdb-id="${row.id}"><i class="fa fa-trash"></i></button>`: "",
             };
         }),
     };
@@ -292,8 +292,8 @@ function CalcUserData() {
         rows: [...globaldata.UserList].map((row) => {
             return {
                 ...row,
-                operation: `
-    <button class="update-btn btn btn-outline-primary btn-floating btn-sm" data-mdb-id="${row.id}"><i class="fas fa-edit"></i></button>`,
+                operation:globaldata.User.role === 1 ? `
+    <button class="update-btn btn btn-outline-primary btn-floating btn-sm" data-mdb-id="${row.id}"><i class="fas fa-edit"></i></button>`: "",
             };
         }),
     };
@@ -379,6 +379,7 @@ async function getStreamList() {
 
 function updateStream() {
     // 更新视频流（axios)
+    axios.defaults.headers.common['Authorization'] = 'Bearer ' + globaldata.Token;
     axios
         .post("/videolistupdate", {
             videoid: document.getElementById("upstreamid").value,
@@ -399,6 +400,7 @@ function updateStream() {
 
 function addStream() {
     // 添加视频流（axios)
+    axios.defaults.headers.common['Authorization'] = 'Bearer ' + globaldata.Token;
     axios
         .post("/videolistadd", {
             streamname: document.getElementById("streamname").value,
@@ -418,6 +420,7 @@ function addStream() {
 
 function deleteStream(id) {
     // 删除视频流（axios)
+    axios.defaults.headers.common['Authorization'] = 'Bearer ' + globaldata.Token;
     axios
         .post("/videolistdelete", {
             videoid: id,
@@ -452,6 +455,7 @@ async function getUserList() {
 
 function updateUser() {
     // 更新用户信息（axios)
+    axios.defaults.headers.common['Authorization'] = 'Bearer ' + globaldata.Token;
     axios
         .post("/userlistupdate", {
             userid: document.getElementById("upuserid").value,
@@ -512,8 +516,8 @@ async function getAllImage() {
 
 function deleteImage(dom) {
     // 删除图片（axios)
+    axios.defaults.headers.common['Authorization'] = 'Bearer ' + globaldata.Token;
     let id = dom.getAttribute("data-imageid");
-    console.log(`delete image ${id}`);
     axios
         .post("/imagelistdelete", {
             imageid: id,
@@ -523,7 +527,7 @@ function deleteImage(dom) {
             if (res.data.code === 200) {
                 alert("删除成功");
                 await getAllImage();
-                loadPage(ImageManagePage(globaldata.ImageList));
+                loadPage(ImageManagePage(globaldata.ImageList,globaldata.User.role));
             } else {
                 alert("删除失败");
             }

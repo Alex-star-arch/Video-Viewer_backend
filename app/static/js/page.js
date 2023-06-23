@@ -57,7 +57,7 @@ function VideoAnalysePage(VideoAnalyseList,VideoIndex) {
     return page;
 }
 
-function VideoManagePage() {
+function VideoManagePage(UserRole) {
     let page = `
     <div class="row m-0 vh-100">
     <div class="card ">
@@ -74,7 +74,7 @@ function VideoManagePage() {
         </div>
       </div>
       <div class="card-body">
-        <div class="my-2">
+        <div class="my-2" style="display: ${UserRole===1?"block":"none"}">
           <button type="button" class="btn btn-primary" id="add-btn">
             <i class="fas fa-plus"></i>
           </button>
@@ -87,7 +87,7 @@ function VideoManagePage() {
     return page;
 }
 
-function UserManagePage() {
+function UserManagePage(UserRole) {
     let page = `
     <div class="row m-0 vh-100">
     <div class="card ">
@@ -112,7 +112,7 @@ function UserManagePage() {
     return page;
 }
 
-function ImageManagePage(ImageList) {
+function ImageManagePage(ImageList,UserRole) {
     //将ImageList中的datetime(Thu, 23 Mar 2023 20:03:42 GMT)转换为2023-05-23 20:03:42
     for (let i = 0; i < ImageList.length; i++) {
         ImageList[i].datetime = Date.parse(ImageList[i].datetime);
@@ -134,7 +134,7 @@ function ImageManagePage(ImageList) {
                 <li class="list-group-item px-3">采集时间：${ImageList[i].datetime}</li>
             </ul>
         </div>
-      <div class="card-footer text-muted">
+      <div class="card-footer text-muted" style="display: ${UserRole===1?"block":"none"}">
         <button class="btn btn-danger" data-imageid="${ImageList[i].id}" onclick="deleteImage(this)">删除</button>
       </div>
     </div>

@@ -43,39 +43,72 @@ def videoimage():
 # 增加视频流
 @main.route('/videolistadd', methods=['POST'])
 def videolistadd():
-    streamname = json.loads(request.get_data().decode('utf-8'))['streamname']
-    stream = json.loads(request.get_data().decode('utf-8'))['stream']
-    result = database.addStream(streamname, stream)
-    if result == 'Fail':
-        return {'code': 500, 'msg': '添加失败'}
+    # 检验JWT
+    # bearer token
+    token = request.headers.get('Authorization').split(' ')[1]
+    payload = parse_jwt(token)
+    if payload is None:
+        return {'code': 500, 'msg': '请先登录'}
     else:
-        return {'code': 200, 'msg': '添加成功'}
+        role = payload['role']
+        if role != 'admin':
+            return {'code': 500, 'msg': '您没有权限'}
+        else:
+            streamname = json.loads(request.get_data().decode('utf-8'))['streamname']
+            stream = json.loads(request.get_data().decode('utf-8'))['stream']
+            result = database.addStream(streamname, stream)
+            if result == 'Fail':
+                return {'code': 500, 'msg': '添加失败'}
+            else:
+                return {'code': 200, 'msg': '添加成功'}
 
 
 # 删除视频流
 @main.route('/videolistdelete', methods=['POST'])
 def videolistdelete():
-    video_id = json.loads(request.get_data().decode('utf-8'))['videoid']
-    result = database.deleteStream(video_id)
-    if result == 'Fail':
-        return {'code': 500, 'msg': '删除失败'}
+    # 检验JWT
+    # bearer token
+    token = request.headers.get('Authorization').split(' ')[1]
+    payload = parse_jwt(token)
+    if payload is None:
+        return {'code': 500, 'msg': '请先登录'}
     else:
-        return {'code': 200, 'msg': '删除成功'}
+        role = payload['role']
+        if role != 'admin':
+            return {'code': 500, 'msg': '您没有权限'}
+        else:
+            video_id = json.loads(request.get_data().decode('utf-8'))['videoid']
+            result = database.deleteStream(video_id)
+            if result == 'Fail':
+                return {'code': 500, 'msg': '删除失败'}
+            else:
+                return {'code': 200, 'msg': '删除成功'}
 
 
 # 视频流列表修改
 @main.route('/videolistupdate', methods=['POST'])
 def videolistupdate():
-    updateid = json.loads(request.get_data().decode('utf-8'))['videoid']
-    updatestreamname = json.loads(request.get_data().decode('utf-8'))['streamname']
-    updatestream = json.loads(request.get_data().decode('utf-8'))['stream']
-    result = database.updateStream(updateid, updatestreamname, updatestream)
-    if result == 'Fail':
-        return {'code': 500, 'msg': '修改失败'}
-    elif result == 'Exist':
-        return {'code': 500, 'msg': '已存在该视频流'}
+    # 检验JWT\
+    # bearer token
+    token = request.headers.get('Authorization').split(' ')[1]
+    payload = parse_jwt(token)
+    if payload is None:
+        return {'code': 500, 'msg': '请先登录'}
     else:
-        return {'code': 200, 'msg': '修改成功'}
+        role = payload['role']
+        if role != 'admin':
+            return {'code': 500, 'msg': '您没有权限'}
+        else:
+            updateid = json.loads(request.get_data().decode('utf-8'))['videoid']
+            updatestreamname = json.loads(request.get_data().decode('utf-8'))['streamname']
+            updatestream = json.loads(request.get_data().decode('utf-8'))['stream']
+            result = database.updateStream(updateid, updatestreamname, updatestream)
+            if result == 'Fail':
+                return {'code': 500, 'msg': '修改失败'}
+            elif result == 'Exist':
+                return {'code': 500, 'msg': '已存在该视频流'}
+            else:
+                return {'code': 200, 'msg': '修改成功'}
 
 
 # 视频流列表查询
@@ -151,12 +184,23 @@ def imagelistquery():
 
 @main.route('/imagelistdelete', methods=['POST'])
 def imagelistdelete():
-    image_id = json.loads(request.get_data().decode('utf-8'))['imageid']
-    result = database.deleteImage(image_id)
-    if result == 'Fail':
-        return {'code': 500, 'msg': '删除失败'}
+    # 检验JWT
+    # bearer token
+    token = request.headers.get('Authorization').split(' ')[1]
+    payload = parse_jwt(token)
+    if payload is None:
+        return {'code': 500, 'msg': '请先登录'}
     else:
-        return {'code': 200, 'msg': '删除成功'}
+        role = payload['role']
+        if role != 'admin':
+            return {'code': 500, 'msg': '您没有权限'}
+        else:
+            image_id = json.loads(request.get_data().decode('utf-8'))['imageid']
+            result = database.deleteImage(image_id)
+            if result == 'Fail':
+                return {'code': 500, 'msg': '删除失败'}
+            else:
+                return {'code': 200, 'msg': '删除成功'}
 
 
 # 用户界面
