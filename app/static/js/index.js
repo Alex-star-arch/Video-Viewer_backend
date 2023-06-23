@@ -55,14 +55,14 @@ const collapseList = collapseElementList.map((collapseEl) => {
     });
 });
 
-function init() {
+async function init() {
     const sidenav = document.getElementById("Side-nav");
     const sidenavInstance = mdb.Sidenav.getInstance(sidenav);
-    getVideoList();
-    getStreamList();
-    getUser();
-    getUserList();
-    getAllWarn();
+    await getVideoList();
+    await getStreamList();
+    await getUser();
+    await getUserList();
+    await getAllWarn();
     setTimeout(() => {
         getAllImage();
     }, 2000)
@@ -103,10 +103,6 @@ Router = async function (Data) {
             if (globaldata.User.role !== 1) {
                 alert("您没有权限进行此操作！")
             }
-            break;
-        case "UserPannel":
-            collapseHide();
-            loadPage(UserPannelPage(globaldata.User));
             break;
         case "ImageManage":
             loadPage(ImageManagePage(globaldata.ImageList));
@@ -343,9 +339,9 @@ function CalcWarnData() {
     };
 }
 
-function getVideoList() {
+async function getVideoList() {
     // 从后端获取视频列表（axios)
-    axios.get("/allvideolist").then((res) => {
+    await axios.get("/allvideolist").then((res) => {
         if (res.data.code === 200) {
             globaldata.VideoList = res.data.data;
         } else {
@@ -472,11 +468,11 @@ function updateUser() {
         });
 }
 
-function getUser() {
+async function getUser() {
     // 从后端获取用户信息（axios)
     //发送token(Authorization bearer)
     axios.defaults.headers.common['Authorization'] = 'Bearer ' + globaldata.Token;
-    axios.post("/userrole").then((res) => {
+    await axios.post("/userrole").then((res) => {
         if (res.data.code === 200) {
             globaldata.User.role = res.data.data[0];
         } else {
@@ -544,7 +540,9 @@ async function getAllWarn() {
     });
 }
 
-function tologin() {
+function Logout() {
+    globaldata.Token = "";
+    globaldata.User = {};
     window.location.href = "http://127.0.0.1:8080";
 }
 
