@@ -67,6 +67,7 @@ async function init() {
         getAllImage();
     }, 2000)
     sidenavInstance.show();
+    Router(document.getElementById("VideoFlow"));
 }
 
 init();
