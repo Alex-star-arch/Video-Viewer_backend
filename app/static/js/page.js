@@ -3,9 +3,12 @@ function VideoFlowPage(VideoUrlList) {
     <div class="row m-0" style="">
     `;
     for (let i = 0; i < VideoUrlList.length; i++) {
+        //判断是否为rtsp流
+        const isRTSP = VideoUrlList[i].indexOf("rtsp")!==-1;
+        const src=isRTSP?`ws://localhost:8888/rtsp/${i}/?url=`+VideoUrlList[i]:VideoUrlList[i];
         let InnerContent = `
       <div  class="col-4 p-0" onclick="Router(this)" data-route="VideoAnysis" data-video="${i}">
-        <video autoplay muted style="width:100%;height: 100%;">
+        <video autoplay muted style="width:100%;height: 100%;" id="Video-preview-${i}" data-protocol="${isRTSP?"RTSP":"HTTP"}" data-src="${src}">
           <source src="${VideoUrlList[i]}" type="video/mp4">
           <source src="../static/video/defult.mp4" type="video/mp4">
           </video>
@@ -17,15 +20,16 @@ function VideoFlowPage(VideoUrlList) {
     return page;
 }
 
-function VideoAnysisPage(VideoAnysisList) {
+function VideoAnalysePage(VideoAnalyseList,VideoIndex) {
+    const isRTSP = VideoAnalyseList.VideoUrl.indexOf("rtsp")!==-1;
+    const src=isRTSP?`ws://localhost:8888/rtsp/${VideoIndex}/?url=`+VideoAnalyseList.VideoUrl:VideoAnalyseList.VideoUrl;
     let page = `
     <div class="row m-0">
       <div class="col-9 p-0" id="VideoViewer">
-        <video autoplay controls style="width:100%;height: 100%;">
-          <source src="${VideoAnysisList.VideoUrl}" type="video/mp4">
-            <source src="../static/video/defult.mp4" type="video/mp4">
+        <video autoplay controls style="width:100%;height: 100%;" id="Video-analyse" data-protocol="${isRTSP?"RTSP":"HTTP"}" data-src="${src}">
+          <source src="${VideoAnalyseList.VideoUrl}" type="video/mp4">
+           <source src="../static/video/defult.mp4" type="video/mp4">
         </video>
-        <!-- <img src="${VideoAnysisList.VideoUrl}" class="img-fluid" alt="Wild Landscape" /> -->
         <div class="p-4 d-flex" id="BottomBar">
           <div class="btn-outline-light p-3 mx-3 bg-gradient d-flex flex-column align-items-center OperatorButton" data-mdb-toggle="modal" data-mdb-target="#timemodal">
             <i class="far fa-clock fa-4x mx-4"></i>
@@ -36,7 +40,7 @@ function VideoAnysisPage(VideoAnysisList) {
       <div class="col-3 p-0" id="ImageList">
         <ul class="list-group list-group-light" id="ImageList">
     `;
-    for (let VideoAnysisImage of VideoAnysisList.VideoAnysisImage) {
+    for (let VideoAnysisImage of VideoAnalyseList.VideoAnysisImage) {
         page += `
       <li class="list-group-item black-list">
         <img src="data:image/jpeg;base64,${VideoAnysisImage}" class="img-fluid" alt="Wild Landscape"/>
@@ -111,17 +115,13 @@ function UserPannelPage(User) {
     <div class="row d-flex justify-content-center align-items-center vh-100 bg-light">
     <div class="card text-center  shadow-0 p-0 w-25 shadow-custom">
       <div class="bg-image hover-overlay ripple" data-mdb-ripple-color="light">
-        <img src="https://mdbootstrap.com/img/new/standard/nature/111.webp" class="img-fluid" />
+        <img src="https://mdbootstrap.com/img/new/standard/nature/111.webp" class="img-fluid" alt="Avatar"/>
         <a href="#!">
           <div class="mask" style="background-color: rgba(251, 251, 251, 0.15)"></div>
         </a>
       </div>
       <div class="card-header">${User.name}</div>
       <div class="card-body">
-        <h5 class="card-title">${User.phone}</h5>
-        <p class="card-text">
-          ${User.email}
-        </p>
         <button type="button" class="btn btn-primary" onclick="tologin()">注销</button>
       </div>
     </div>
@@ -142,7 +142,7 @@ function ImageManagePage(ImageList) {
     for (let i = 0; i < ImageList.length; i++) {
         let image = `
     <div class="card col-3 p-0 mx-2 my-2" style="height: fit-content;">
-      <img src="data:image/jpeg;base64,${ImageList[i].image}" class="img-fluid" style="max-height: 180px"/>
+      <img src="data:image/jpeg;base64,${ImageList[i].image}" class="img-fluid" style="max-height: 180px" alt="WarnPic"/>
         <div class="card-body p-0">
             <ul class="list-group list-group-light list-group-small">
                 <li class="list-group-item px-3">图片ID:${ImageList[i].id}</li>
@@ -178,11 +178,6 @@ function WarnManagePage() {
         </div>
       </div>
       <div class="card-body">
-        <div class="my-2">
-          <button type="button" class="btn btn-primary" id="add-btn">
-            <i class="fas fa-plus"></i>
-          </button>
-        </div>
         <div id="warntable" data-mdb-stripped="true" data-mdb-max-height="80vh" data-mdb-max-width="100vw"></div>
       </div>
     </div>

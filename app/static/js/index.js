@@ -79,12 +79,14 @@ Router = async function (Data) {
         case "VideoFlow":
             collapseHide();
             loadPage(VideoFlowPage(globaldata.VideoList));
+            VideoFlowInit();
             break;
         case "VideoAnysis":
             if (!VideoId) await getVideoImage(0);
             else await getVideoImage(VideoId);
             globaldata.VideoAnysisList.VideoUrl = globaldata.VideoList[VideoId];
-            loadPage(VideoAnysisPage(globaldata.VideoAnysisList));
+            loadPage(VideoAnalysePage(globaldata.VideoAnysisList, VideoId));
+            VideoAnalyseInit();
             break;
         case "VideoManage":
             collapseHide();
@@ -119,6 +121,41 @@ Router = async function (Data) {
 
 function loadPage(page) {
     document.querySelector("#Content").innerHTML = page;
+}
+
+function VideoFlowInit() {
+    for (let i = 0; i < globaldata.VideoList.length; i++) {
+        let video = document.getElementById(`Video-preview-${i}`);
+        if (video.dataset.protocol === 'RTSP') {
+            console.log(`RTSP ${video.dataset.src}`);
+            if (flvjs.isSupported()) {
+                const flvPlayer = flvjs.createPlayer({
+                    type: 'flv',
+                    url: video.dataset.src,
+                });
+                flvPlayer.attachMediaElement(video);
+                flvPlayer.load();
+                flvPlayer.play();
+            }
+        }
+
+    }
+}
+
+function VideoAnalyseInit() {
+    const video = document.getElementById("Video-analyse");
+    if (video.dataset.protocol === 'RTSP') {
+        console.log(`RTSP ${video.dataset.src}`);
+        if (flvjs.isSupported()) {
+            const flvPlayer = flvjs.createPlayer({
+                type: 'flv',
+                url: video.dataset.src,
+            });
+            flvPlayer.attachMediaElement(video);
+            flvPlayer.load();
+            flvPlayer.play();
+        }
+    }
 }
 
 function VideoManageInit() {
@@ -501,7 +538,7 @@ async function getAllWarn() {
     await axios.get("/alertquery").then((res) => {
         if (res.data.code === 200) {
             globaldata.WarnList = res.data.data;
-            if(warnTable)warnTable.update(CalcWarnData());
+            if (warnTable) warnTable.update(CalcWarnData());
         } else {
             console.log(res.data.msg);
         }
