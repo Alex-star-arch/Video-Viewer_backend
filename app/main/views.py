@@ -123,13 +123,14 @@ def videolistquery():
 def addClock():
     hour = int(request.form['hour'])
     minute = int(request.form['minute'])
+    offLineList = request.form['offLineList']
     form = {
         'hour': hour,
         'minute': minute,
+        'offLineList': offLineList,
     }
     url = "http://127.0.0.1:5001/clock"
     r = requests.post(url, form)
-    # result = database.streamlistquery()
     return {'code': 200, 'msg': 'success'}
 
 

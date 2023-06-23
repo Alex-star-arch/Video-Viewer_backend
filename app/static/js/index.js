@@ -7,6 +7,7 @@ const globaldata = {
     StreamList: [],
     UserList: [],
     ImageList: [],
+    offLineList:[],
     Token: localStorage.getItem('token'),
     User: {
         username: "",
@@ -150,6 +151,8 @@ function VideoFlowInit() {
                     flvPlayer.detachMediaElement();
                     flvPlayer.destroy();
                     flvPlayer=null;
+                    const videoRealId=globaldata.StreamList.find((item)=>item.stream===globaldata.VideoList[i]).id;
+                    globaldata.offLineList.push(videoRealId);
                 }
                 });
             }
@@ -529,6 +532,7 @@ function addClock() {
     let form = new FormData();
     form.append("hour", hour);
     form.append("minute", minute);
+    form.append("offLineList", JSON.stringify(globaldata.offLineList));
     axios.post("/addClock", form).then((res) => {
         if (res.data.msg === "success") {
             alert("设置成功");
