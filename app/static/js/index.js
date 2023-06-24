@@ -109,6 +109,7 @@ Router = async function (Data) {
             break;
         case "ImageManage":
             await getVideoImage(0);
+            await getAllImage();
             loadPage(ImageManagePage(globaldata.ImageList, globaldata.User.role));
             break;
         case "WarnManage":

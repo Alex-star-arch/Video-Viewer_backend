@@ -7,7 +7,7 @@ import pymysql
 
 
 def _connect():
-    return pymysql.connect(host="localhost", user="root", password="2277", database="video",
+    return pymysql.connect(host="localhost", user="root", password="root", database="video",
                            charset='utf8', use_unicode=True, max_allowed_packet=24 * 1024 * 1024 * 1024)
 
 
