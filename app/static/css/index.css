@@ -35,7 +35,7 @@ main{
     height: 20vh;
 }
 #Content{
-    overflow: hidden;
+    overflow: auto;
 }
 .OperatorButton{
     height: fit-content;
