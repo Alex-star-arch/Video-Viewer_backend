@@ -160,7 +160,7 @@ function VideoFlowInit() {
                 });
                 flvPlayer.on(flvjs.Events.STATISTICS_INFO, (res) => {
                     if(res.speed===0)offLineCount++;
-                    if(offLineCount>20){
+                    if(offLineCount>10){
                     console.log(i,"号视频流已断开");
                     flvPlayer.pause();
                     flvPlayer.unload();
@@ -196,7 +196,7 @@ function VideoAnalyseInit() {
             flvPlayer.play();
             flvPlayer.on(flvjs.Events.STATISTICS_INFO, (res) => {
                     if(res.speed===0)offLineCount++;
-                    if(offLineCount>20){
+                    if(offLineCount>10){
                     console.log("视频流已断开");
                     flvPlayer.pause();
                     flvPlayer.unload();
