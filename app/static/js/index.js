@@ -7,7 +7,7 @@ const globaldata = {
     StreamList: [],
     UserList: [],
     ImageList: [],
-    offLineList:[],
+    offLineList: [],
     Token: localStorage.getItem('token'),
     User: {
         username: "",
@@ -144,32 +144,32 @@ function VideoFlowInit() {
                 flvPlayer.attachMediaElement(video);
                 flvPlayer.load();
                 flvPlayer.play();
-                 flvPlayer.on(flvjs.Events.ERROR, (errorType, errorDetail, errorInfo)=>{
+                flvPlayer.on(flvjs.Events.ERROR, (errorType, errorDetail, errorInfo) => {
                     // console.log("errorType", errorType);
                     // console.log("errorDetail", errorDetail);
                     // console.log("errorInfo", errorInfo);
-                    console.log(i,"号视频流已断开");
+                    console.log(i, "号视频流已断开");
                     flvPlayer.pause();
                     flvPlayer.unload();
                     flvPlayer.detachMediaElement();
                     flvPlayer.destroy();
-                    flvPlayer=null;
-                    const videoRealId=globaldata.StreamList.find((item)=>item.stream===globaldata.VideoList[i]).id;
+                    flvPlayer = null;
+                    const videoRealId = globaldata.StreamList.find((item) => item.stream === globaldata.VideoList[i]).id;
                     globaldata.offLineList.push(videoRealId);
 
                 });
                 flvPlayer.on(flvjs.Events.STATISTICS_INFO, (res) => {
-                    if(res.speed===0)offLineCount++;
-                    if(offLineCount>10){
-                    console.log(i,"号视频流已断开");
-                    flvPlayer.pause();
-                    flvPlayer.unload();
-                    flvPlayer.detachMediaElement();
-                    flvPlayer.destroy();
-                    flvPlayer=null;
-                    const videoRealId=globaldata.StreamList.find((item)=>item.stream===globaldata.VideoList[i]).id;
-                    globaldata.offLineList.push(videoRealId);
-                }
+                    if (res.speed === 0) offLineCount++;
+                    if (offLineCount > 10) {
+                        console.log(i, "号视频流已断开");
+                        flvPlayer.pause();
+                        flvPlayer.unload();
+                        flvPlayer.detachMediaElement();
+                        flvPlayer.destroy();
+                        flvPlayer = null;
+                        const videoRealId = globaldata.StreamList.find((item) => item.stream === globaldata.VideoList[i]).id;
+                        globaldata.offLineList.push(videoRealId);
+                    }
                 });
             }
         }
@@ -195,30 +195,30 @@ function VideoAnalyseInit() {
             flvPlayer.load();
             flvPlayer.play();
             flvPlayer.on(flvjs.Events.STATISTICS_INFO, (res) => {
-                    if(res.speed===0)offLineCount++;
-                    if(offLineCount>10){
+                if (res.speed === 0) offLineCount++;
+                if (offLineCount > 10) {
                     console.log("视频流已断开");
                     flvPlayer.pause();
                     flvPlayer.unload();
                     flvPlayer.detachMediaElement();
                     flvPlayer.destroy();
-                    flvPlayer=null;
+                    flvPlayer = null;
                 }
-                });
-            flvPlayer.on(flvjs.Events.ERROR, (errorType, errorDetail, errorInfo)=>{
-                    // console.log("errorType", errorType);
-                    // console.log("errorDetail", errorDetail);
-                    // console.log("errorInfo", errorInfo);
-                    console.log("视频流已断开");
-                    flvPlayer.pause();
-                    flvPlayer.unload();
-                    flvPlayer.detachMediaElement();
-                    flvPlayer.destroy();
-                    flvPlayer=null;
-                    const videoRealId=globaldata.StreamList.find((item)=>item.stream===globaldata.VideoList[i]).id;
-                    globaldata.offLineList.push(videoRealId);
+            });
+            flvPlayer.on(flvjs.Events.ERROR, (errorType, errorDetail, errorInfo) => {
+                // console.log("errorType", errorType);
+                // console.log("errorDetail", errorDetail);
+                // console.log("errorInfo", errorInfo);
+                console.log("视频流已断开");
+                flvPlayer.pause();
+                flvPlayer.unload();
+                flvPlayer.detachMediaElement();
+                flvPlayer.destroy();
+                flvPlayer = null;
+                const videoRealId = globaldata.StreamList.find((item) => item.stream === globaldata.VideoList[i]).id;
+                globaldata.offLineList.push(videoRealId);
 
-                });
+            });
         }
     }
 }
@@ -243,9 +243,12 @@ function VideoManageInit() {
         // 视频流删除按钮
         document.getElementsByClassName("delete-btn").forEach((btn) => {
             btn.addEventListener("click", () => {
-                let id = btn.attributes["data-mdb-id"].value;
-                console.log(`delete Stream ${id}`);
-                deleteStream(id);
+                //确认删除弹窗
+                if (confirm("确认删除该视频流吗？")) {
+                    let id = btn.attributes["data-mdb-id"].value;
+                    console.log(`delete Stream ${id}`);
+                    deleteStream(id);
+                }
             });
         });
     };
@@ -267,6 +270,9 @@ function VideoManageInit() {
         multi: true,
         entriesOptions: [5, 10, 15],
         fixedHeader: true,
+        noFoundMessage: "没有找到相关数据",
+        rowsText: "每页行数",
+        ofText: "共",
     };
     const basicData = CalcVideoData();
     const TableInstance = new mdb.Datatable(
@@ -333,6 +339,9 @@ function UserManageInit() {
         multi: true,
         entriesOptions: [5, 10, 15],
         fixedHeader: true,
+        noFoundMessage: "没有找到相关数据",
+        rowsText: "每页行数",
+        ofText: "共",
     };
 
     const basicData = CalcUserData();
@@ -376,6 +385,9 @@ function WarnManageInit() {
         multi: true,
         entriesOptions: [5, 10, 15],
         fixedHeader: true,
+        noFoundMessage: "没有找到相关数据",
+        rowsText: "每页行数",
+        ofText: "共",
     };
     const basicData = CalcWarnData();
     const TableInstance = new mdb.Datatable(
@@ -583,6 +595,7 @@ async function getAllImage() {
 
 function deleteImage(dom) {
     // 删除图片（axios)
+    if(confirm("确定删除该图片吗？")===false) return;
     axios.defaults.headers.common['Authorization'] = 'Bearer ' + globaldata.Token;
     let id = dom.getAttribute("data-imageid");
     axios

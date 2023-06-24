@@ -69,7 +69,7 @@ function VideoManagePage(UserRole) {
             id="datatable-search-input"
           />
           <label class="form-label" for="datatable-search-input"
-            >Search</label
+            >搜索</label
           >
         </div>
       </div>
@@ -99,7 +99,7 @@ function UserManagePage(UserRole) {
             id="datatable-search-input"
           />
           <label class="form-label" for="datatable-search-input"
-            >Search</label
+            >搜索</label
           >
         </div>
       </div>
@@ -157,7 +157,7 @@ function WarnManagePage() {
             id="datatable-search-input"
           />
           <label class="form-label" for="datatable-search-input"
-            >Search</label
+            >搜索</label
           >
         </div>
       </div>
