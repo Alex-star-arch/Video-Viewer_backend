@@ -1,10 +1,15 @@
 function register() {
-    var username = $("#username").val();
-    var password = $("#password").val();
-    var password2 = $("#ensurepassword").val();
+    const username = $("#username").val();
+    const password = $("#password").val();
+    const password2 = $("#ensurepassword").val();
     if (password != password2) {
         alert("两次输入的密码不一致！");
-    } else {
+    }
+    else if(username === "" || password === "" || password2 === "")
+    {
+        alert("用户名或密码不能为空！");
+    }
+    else {
         axios.post('/register', {
             username: username,
             password: password

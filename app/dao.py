@@ -1,12 +1,13 @@
 import base64
 import os
+import shutil
 from datetime import datetime
 import re
 import pymysql
 
 
 def _connect():
-    return pymysql.connect(host="localhost", user="root", password="root", database="video",
+    return pymysql.connect(host="localhost", user="root", password="2277", database="video",
                            charset='utf8', use_unicode=True, max_allowed_packet=24 * 1024 * 1024 * 1024)
 
 
@@ -25,8 +26,8 @@ class Database:
                 id        INT(11)        NOT NULL PRIMARY KEY AUTO_INCREMENT,
                 streamnum   VARCHAR(255) NOT NULL,
                 date      DATETIME       NOT NULL,
-                image      longblob
-
+                image      longblob      NOT NULL,
+                weeds     VARCHAR(45)
                 )CHARACTER SET utf8 COLLATE utf8_general_ci
                 """ % TableName
             self.cursor.execute(sql)
@@ -42,32 +43,33 @@ class Database:
         self.cursor = connection.cursor()
         try:
             folder_path = 'app/static/images/picture'  # 文件夹路径
-            for filename in os.listdir(folder_path):
-                if filename.endswith('.jpg') or filename.endswith('.png'):
-                    # 提取图像文件名
-                    index = filename.find(".mp4")
-                    if index != -1:
-                        filenamep = filename[:index]
-                    print("filename:" + filenamep)
+            if os.path.exists(folder_path):
+                for filename in os.listdir(folder_path):
+                    if filename.endswith('.jpg') or filename.endswith('.png'):
+                        # 提取图像文件名
+                        index = filename.find(".mp4")
+                        if index != -1:
+                            filenamep = filename[:index]
+                        print("filename:" + filenamep)
 
-                    indexweed = filename.rfind("+")
-                    indexweedtail = filename.find(".jpg")
-                    if indexweed != -1 and indexweedtail != -1:
-                        strweed = filename[indexweed + 1:indexweedtail]
-                    print("strweed:" + strweed)
-                    match = re.search(r'\+(.*?)\+', filename)
-                    if match:
-                        streamnum = match.group(1)
-                    date = datetime.now()
-                    sql2 = "insert into picture(id,streamnum, date, image, weeds) values(0,%s,%s,%s,%s)"
-                    with open(os.path.join(folder_path, filename), 'rb') as f:
-                        image_data = f.read()
-                    image_base64 = base64.b64encode(image_data).decode('utf-8')
-                    image = f'data:image/jpeg;base64,{image_base64}'
-                    imageTuple = (streamnum, date, image, strweed)
-                    self.cursor.execute(sql2, imageTuple)
-                    connection.commit()
-                    os.remove(os.path.join(folder_path, filename))
+                        indexweed = filename.rfind("+")
+                        indexweedtail = filename.find(".jpg")
+                        if indexweed != -1 and indexweedtail != -1:
+                            strweed = filename[indexweed + 1:indexweedtail]
+                        print("strweed:" + strweed)
+                        match = re.search(r'\+(.*?)\+', filename)
+                        if match:
+                            streamnum = match.group(1)
+                        date = datetime.now()
+                        sql2 = "insert into picture(id,streamnum, date, image, weeds) values(0,%s,%s,%s,%s)"
+                        with open(os.path.join(folder_path, filename), 'rb') as f:
+                            image_data = f.read()
+                        image_base64 = base64.b64encode(image_data).decode('utf-8')
+                        image = f'data:image/jpeg;base64,{image_base64}'
+                        imageTuple = (streamnum, date, image, strweed)
+                        self.cursor.execute(sql2, imageTuple)
+                        connection.commit()
+                shutil.rmtree(folder_path)
         finally:
             connection.close()
 
@@ -77,7 +79,7 @@ class Database:
         connection = _connect()
         self.cursor = connection.cursor()
         try:
-            sql = """select image from picture where streamnum = %s"""
+            sql = """select image from picture where streamnum = %s ORDER BY id DESC"""
             self.cursor.execute(sql, VideoId)
             images = self.cursor.fetchall()
             decoded_images = []
@@ -212,16 +214,17 @@ class Database:
         # 获取所有流
         self.cursor = None
         connection = _connect()
-        self.cursor = connection.cursor()
+        self.cursor1 = connection.cursor()
         try:
             sql = """select * from streams"""
-            self.cursor.execute(sql)
-            streams = self.cursor.fetchall()
+            self.cursor1.execute(sql)
+            streams = self.cursor1.fetchall()
             data = []
             for row in streams:
                 # 创建一个空字典
                 # cn_date = row[3].strftime("%Y年%m月%d日 %H时%M分%S秒")
-                temp_dict = {"id": row[0], "streamname": row[1], "stream": row[2], "datetime": row[3]}
+                time = row[3].strftime("%Y-%m-%d %H:%M:%S")
+                temp_dict = {"id": row[0], "streamname": row[1], "stream": row[2], "datetime": time}
                 # 将每个列和相应的值添加到字典中
                 data.append(temp_dict)
             return data
@@ -354,12 +357,12 @@ class Database:
         # 获取用户角色
         self.cursor = None
         connection = _connect()
-        self.cursor = connection.cursor()
+        self.cursor2 = connection.cursor()
         try:
             sql = """select status from user where username = %s"""
             values = username
-            self.cursor.execute(sql, values)
-            result = self.cursor.fetchone()
+            self.cursor2.execute(sql, values)
+            result = self.cursor2.fetchone()
             return result
         except Exception as e:
             print("getUserRole Error:", e)
@@ -441,7 +444,7 @@ class Database:
                     if tuple_data[3] is None:
                         continue
                     modified_date = tuple_data[2].strftime("%Y-%m-%d %H:%M:%S")
-                    modified_element = tuple_data[3].replace('weeds,', '处草').replace('vines,', '处藤蔓')
+                    modified_element = tuple_data[3].replace('weeds,', '处草').replace('vines,', '处藤蔓').replace('weed,', '处草').replace('vine,', '处藤蔓')
                     modified_tuple = tuple_data[:2] + (modified_date,) + (modified_element,) + tuple_data[3:]
                     temp_dict = {"streamid": modified_tuple[0], "streamname": modified_tuple[1],
                                  "datetime": modified_tuple[2],
