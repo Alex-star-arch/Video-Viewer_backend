@@ -113,6 +113,7 @@ Router = async function (Data) {
             loadPage(ImageManagePage(globaldata.ImageList, globaldata.User.role));
             break;
         case "WarnManage":
+            await getAllWarn();
             loadPage(WarnManagePage());
             warnTable = WarnManageInit();
             break;
